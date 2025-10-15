@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Plus, Send, Calendar, Users } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 interface Broadcast {
   id: string;
@@ -254,7 +254,6 @@ export const Broadcasts = () => {
         </div>
       )}
 
-      <Toaster position="top-right" />
     </div>
   );
 };

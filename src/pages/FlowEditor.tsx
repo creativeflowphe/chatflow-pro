@@ -20,10 +20,12 @@ import { MessageNode } from '../components/flow/nodes/MessageNode';
 import { ConditionNode } from '../components/flow/nodes/ConditionNode';
 import { ActionNode } from '../components/flow/nodes/ActionNode';
 import { BroadcastNode } from '../components/flow/nodes/BroadcastNode';
+import { PlatformSelectorNode } from '../components/flow/nodes/PlatformSelectorNode';
 import { NodePalette } from '../components/flow/NodePalette';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 const nodeTypes = {
+  platformSelector: PlatformSelectorNode,
   trigger: TriggerNode,
   message: MessageNode,
   condition: ConditionNode,
@@ -54,12 +56,23 @@ export const FlowEditor = () => {
       .select('*')
       .eq('id', id)
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
 
     if (!error && data) {
       setAutomation(data);
-      if (data.flow_data?.nodes) {
+      if (data.flow_data?.nodes && data.flow_data.nodes.length > 0) {
         setNodes(data.flow_data.nodes);
+      } else {
+        const initialNode = {
+          id: 'platformSelector-initial',
+          type: 'platformSelector',
+          position: { x: 250, y: 50 },
+          data: {
+            label: 'Selecione as Plataformas',
+            selectedPlatforms: data.selected_platforms || [],
+          },
+        };
+        setNodes([initialNode]);
       }
       if (data.flow_data?.edges) {
         setEdges(data.flow_data.edges);
@@ -122,6 +135,7 @@ export const FlowEditor = () => {
 
   const getNodeLabel = (type: string) => {
     const labels: Record<string, string> = {
+      platformSelector: 'Selecione as Plataformas',
       trigger: 'Quando usuário envia mensagem',
       message: 'Enviar mensagem',
       condition: 'Se condição',
@@ -135,6 +149,7 @@ export const FlowEditor = () => {
 
   const getDefaultNodeData = (type: string) => {
     const defaults: Record<string, any> = {
+      platformSelector: { selectedPlatforms: [] },
       trigger: { keywords: ['oi', 'olá'] },
       message: { content: 'Olá! Como posso ajudar?', buttons: [] },
       condition: { condition: 'Tag contém "cliente"' },
@@ -151,36 +166,46 @@ export const FlowEditor = () => {
 
     setSaving(true);
 
-    const { error } = await supabase
-      .from('automations')
-      .update({
-        flow_data: { nodes, edges },
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', id);
+    try {
+      const platformSelectorNode = nodes.find((n) => n.type === 'platformSelector');
+      const selectedPlatforms = platformSelectorNode?.data?.selectedPlatforms || [];
 
-    setSaving(false);
+      const { error } = await supabase
+        .from('automations')
+        .update({
+          flow_data: { nodes, edges },
+          selected_platforms: selectedPlatforms,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id);
 
-    if (!error) {
-      toast.success('Automação salva com sucesso!');
-    } else {
-      toast.error('Erro ao salvar automação');
+      if (!error) {
+        toast.success('Fluxo salvo com sucesso!');
+      } else {
+        toast.error('Erro ao salvar fluxo');
+        console.error('Erro:', error);
+      }
+    } catch (error) {
+      console.error('Erro inesperado:', error);
+      toast.error('Erro ao salvar fluxo');
+    } finally {
+      setSaving(false);
     }
   };
 
   const toggleStatus = async () => {
     if (!id || !user || !automation) return;
 
-    const newStatus = automation.status === 'active' ? 'inactive' : 'active';
+    const newStatus = !automation.is_active;
 
     const { error } = await supabase
       .from('automations')
-      .update({ status: newStatus })
+      .update({ is_active: newStatus })
       .eq('id', id);
 
     if (!error) {
-      setAutomation({ ...automation, status: newStatus });
-      toast.success(`Automação ${newStatus === 'active' ? 'ativada' : 'desativada'} com sucesso!`);
+      setAutomation({ ...automation, is_active: newStatus });
+      toast.success(`Automação ${newStatus ? 'ativada' : 'desativada'} com sucesso!`);
     } else {
       toast.error('Erro ao alterar status da automação');
     }
@@ -228,12 +253,12 @@ export const FlowEditor = () => {
           <button
             onClick={toggleStatus}
             className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
-              automation.status === 'active'
+              automation.is_active
                 ? 'bg-green-600 hover:bg-green-700 text-white'
                 : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
             }`}
           >
-            {automation.status === 'active' ? (
+            {automation.is_active ? (
               <>
                 <Power className="w-4 h-4" />
                 <span>Ativo</span>
@@ -268,7 +293,6 @@ export const FlowEditor = () => {
         <NodePalette onDragStart={onDragStart} />
       </div>
 
-      <Toaster position="top-right" />
     </div>
   );
 };

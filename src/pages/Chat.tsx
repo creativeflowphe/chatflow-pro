@@ -1,69 +1,84 @@
 import { useEffect, useState } from 'react';
-import { Search, MessageCircle, User, Send } from 'lucide-react';
+import { Search, MessageCircle, User, Send, Power } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
-interface Conversation {
+interface Contact {
   id: string;
-  contact_id: string;
-  status: string;
-  last_message_at: string;
-  contacts: {
-    name: string;
-    platform_id: string;
-  };
+  username: string;
+  full_name: string;
+  platform: string;
+  platform_user_id: string;
+  auto_reply_enabled: boolean;
+  last_interaction: string;
 }
 
 interface Message {
   id: string;
-  sender_type: string;
+  direction: string;
   content: string;
   created_at: string;
+  is_automated: boolean;
 }
 
 export const Chat = () => {
   const { user } = useAuth();
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [selectedContact, setSelectedContact] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageInput, setMessageInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadConversations();
+    loadContacts();
   }, [user]);
 
   useEffect(() => {
-    if (selectedConversation) {
-      loadMessages(selectedConversation);
-    }
-  }, [selectedConversation]);
+    if (selectedContact) {
+      loadMessages(selectedContact);
+      const subscription = supabase
+        .channel('messages')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'messages',
+          filter: `contact_id=eq.${selectedContact}`
+        }, () => {
+          loadMessages(selectedContact);
+        })
+        .subscribe();
 
-  const loadConversations = async () => {
+      return () => {
+        subscription.unsubscribe();
+      };
+    }
+  }, [selectedContact]);
+
+  const loadContacts = async () => {
     if (!user) return;
 
     const { data, error } = await supabase
-      .from('conversations')
-      .select('*, contacts(name, platform_id)')
+      .from('contacts')
+      .select('*')
       .eq('user_id', user.id)
-      .order('last_message_at', { ascending: false });
+      .order('last_interaction', { ascending: false, nullsFirst: false });
 
     if (!error && data) {
-      setConversations(data as any);
+      setContacts(data);
       if (data.length > 0) {
-        setSelectedConversation(data[0].id);
+        setSelectedContact(data[0].id);
       }
     }
     setLoading(false);
   };
 
-  const loadMessages = async (conversationId: string) => {
+  const loadMessages = async (contactId: string) => {
     const { data, error } = await supabase
       .from('messages')
       .select('*')
-      .eq('conversation_id', conversationId)
+      .eq('contact_id', contactId)
       .order('created_at', { ascending: true });
 
     if (!error && data) {
@@ -72,28 +87,54 @@ export const Chat = () => {
   };
 
   const sendMessage = async () => {
-    if (!messageInput.trim() || !selectedConversation) return;
+    if (!messageInput.trim() || !selectedContact || !user) return;
+
+    const contact = contacts.find(c => c.id === selectedContact);
+    if (!contact) return;
 
     const { error } = await supabase.from('messages').insert({
-      conversation_id: selectedConversation,
-      sender_type: 'human',
+      user_id: user.id,
+      contact_id: selectedContact,
+      platform: contact.platform,
+      direction: 'outbound',
       content: messageInput.trim(),
-      metadata: {},
+      is_automated: false,
+      status: 'sent',
     });
 
     if (!error) {
       setMessageInput('');
-      loadMessages(selectedConversation);
+      await supabase
+        .from('contacts')
+        .update({ last_interaction: new Date().toISOString() })
+        .eq('id', selectedContact);
+      loadMessages(selectedContact);
     } else {
       toast.error('Erro ao enviar mensagem');
     }
   };
 
-  const filteredConversations = conversations.filter((conv) =>
-    conv.contacts.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const toggleAutoReply = async (contactId: string, currentState: boolean) => {
+    const { error } = await supabase
+      .from('contacts')
+      .update({ auto_reply_enabled: !currentState })
+      .eq('id', contactId);
+
+    if (!error) {
+      setContacts(contacts.map(c =>
+        c.id === contactId ? { ...c, auto_reply_enabled: !currentState } : c
+      ));
+      toast.success(!currentState ? 'Respostas automáticas ativadas' : 'Respostas automáticas desativadas');
+    } else {
+      toast.error('Erro ao atualizar configuração');
+    }
+  };
+
+  const filteredContacts = contacts.filter((contact) =>
+    (contact.full_name || contact.username || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const selectedConv = conversations.find((c) => c.id === selectedConversation);
+  const selectedContactData = contacts.find((c) => c.id === selectedContact);
 
   const formatTime = (date: string) => {
     return new Date(date).toLocaleTimeString('pt-BR', {
@@ -124,19 +165,19 @@ export const Chat = () => {
             <div className="flex items-center justify-center h-full">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             </div>
-          ) : filteredConversations.length === 0 ? (
+          ) : filteredContacts.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center p-6">
               <MessageCircle className="w-12 h-12 text-gray-400 mb-3" />
-              <p className="text-gray-600">Nenhuma conversa</p>
+              <p className="text-gray-600">Nenhum contato</p>
             </div>
           ) : (
             <div className="divide-y divide-gray-200">
-              {filteredConversations.map((conv) => (
+              {filteredContacts.map((contact) => (
                 <button
-                  key={conv.id}
-                  onClick={() => setSelectedConversation(conv.id)}
+                  key={contact.id}
+                  onClick={() => setSelectedContact(contact.id)}
                   className={`w-full p-4 text-left hover:bg-gray-50 transition-colors ${
-                    selectedConversation === conv.id ? 'bg-blue-50' : ''
+                    selectedContact === contact.id ? 'bg-blue-50' : ''
                   }`}
                 >
                   <div className="flex items-center space-x-3">
@@ -145,26 +186,28 @@ export const Chat = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="font-medium text-gray-900 truncate">
-                        {conv.contacts.name}
+                        {contact.full_name || contact.username || 'Sem nome'}
                       </div>
                       <div className="text-sm text-gray-500 truncate">
-                        {conv.contacts.platform_id}
+                        {contact.platform} - {contact.platform_user_id}
                       </div>
                     </div>
                   </div>
                   <div className="mt-2 flex items-center justify-between">
                     <span
                       className={`text-xs px-2 py-1 rounded-full ${
-                        conv.status === 'bot'
+                        contact.auto_reply_enabled
                           ? 'bg-green-100 text-green-700'
-                          : 'bg-blue-100 text-blue-700'
+                          : 'bg-gray-100 text-gray-700'
                       }`}
                     >
-                      {conv.status === 'bot' ? 'Bot' : 'Humano'}
+                      {contact.auto_reply_enabled ? 'Auto: ON' : 'Auto: OFF'}
                     </span>
-                    <span className="text-xs text-gray-500">
-                      {formatTime(conv.last_message_at)}
-                    </span>
+                    {contact.last_interaction && (
+                      <span className="text-xs text-gray-500">
+                        {formatTime(contact.last_interaction)}
+                      </span>
+                    )}
                   </div>
                 </button>
               ))}
@@ -174,22 +217,37 @@ export const Chat = () => {
       </div>
 
       <div className="flex-1 flex flex-col">
-        {selectedConv ? (
+        {selectedContactData ? (
           <>
-            <div className="h-16 border-b border-gray-200 flex items-center px-6">
+            <div className="h-16 border-b border-gray-200 flex items-center justify-between px-6">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                   <User className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
                   <div className="font-semibold text-gray-900">
-                    {selectedConv.contacts.name}
+                    {selectedContactData.full_name || selectedContactData.username || 'Sem nome'}
                   </div>
                   <div className="text-sm text-gray-500">
-                    {selectedConv.contacts.platform_id}
+                    {selectedContactData.platform} - {selectedContactData.platform_user_id}
                   </div>
                 </div>
               </div>
+
+              <button
+                onClick={() => toggleAutoReply(selectedContactData.id, selectedContactData.auto_reply_enabled)}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                  selectedContactData.auto_reply_enabled
+                    ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+                title={selectedContactData.auto_reply_enabled ? 'Desativar respostas automáticas' : 'Ativar respostas automáticas'}
+              >
+                <Power className="w-4 h-4" />
+                <span className="text-sm font-medium">
+                  {selectedContactData.auto_reply_enabled ? 'Auto ON' : 'Auto OFF'}
+                </span>
+              </button>
             </div>
 
             <div className="flex-1 overflow-y-auto p-6 space-y-4">
@@ -197,26 +255,33 @@ export const Chat = () => {
                 <div
                   key={message.id}
                   className={`flex ${
-                    message.sender_type === 'contact' ? 'justify-start' : 'justify-end'
+                    message.direction === 'inbound' ? 'justify-start' : 'justify-end'
                   }`}
                 >
                   <div
                     className={`max-w-md px-4 py-2 rounded-lg ${
-                      message.sender_type === 'contact'
+                      message.direction === 'inbound'
                         ? 'bg-gray-200 text-gray-900'
-                        : message.sender_type === 'bot'
+                        : message.is_automated
                         ? 'bg-green-100 text-gray-900'
                         : 'bg-blue-600 text-white'
                     }`}
                   >
                     <p className="text-sm">{message.content}</p>
-                    <p
-                      className={`text-xs mt-1 ${
-                        message.sender_type === 'human' ? 'text-blue-200' : 'text-gray-500'
-                      }`}
-                    >
-                      {formatTime(message.created_at)}
-                    </p>
+                    <div className="flex items-center justify-between mt-1">
+                      <p
+                        className={`text-xs ${
+                          message.direction === 'outbound' && !message.is_automated ? 'text-blue-200' : 'text-gray-500'
+                        }`}
+                      >
+                        {formatTime(message.created_at)}
+                      </p>
+                      {message.is_automated && (
+                        <span className="text-xs bg-green-200 text-green-800 px-2 py-0.5 rounded ml-2">
+                          Auto
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -252,7 +317,6 @@ export const Chat = () => {
         )}
       </div>
 
-      <Toaster position="top-right" />
     </div>
   );
 };

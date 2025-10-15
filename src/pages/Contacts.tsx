@@ -3,7 +3,7 @@ import { Search, Plus, Download, Upload, Tag } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { NewContactModal } from '../components/contacts/NewContactModal';
-import { Toaster } from 'react-hot-toast';
+
 
 interface Contact {
   id: string;
@@ -186,7 +186,6 @@ export const Contacts = () => {
         onSuccess={loadContacts}
       />
 
-      <Toaster position="top-right" />
     </div>
   );
 };

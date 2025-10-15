@@ -1,0 +1,356 @@
+==============================================
+SISTEMA DE AUTOMAÇÃO DE REDES SOCIAIS
+Guia de Instalação e Configuração
+==============================================
+
+ÍNDICE:
+1. Pré-requisitos
+2. Configuração do Banco de Dados Supabase
+3. Variáveis de Ambiente
+4. Instalação Local
+5. Estrutura do Banco de Dados
+6. Funcionalidades Implementadas
+7. Configuração do Instagram
+8. Troubleshooting
+
+==============================================
+1. PRÉ-REQUISITOS
+==============================================
+
+- Node.js 18 ou superior
+- npm ou yarn
+- Conta no Supabase (gratuita)
+- Conta Meta Developer (para Instagram)
+
+==============================================
+2. CONFIGURAÇÃO DO BANCO DE DADOS SUPABASE
+==============================================
+
+A. Criar Projeto no Supabase:
+   1. Acesse https://supabase.com
+   2. Crie uma nova conta ou faça login
+   3. Clique em "New Project"
+   4. Preencha os dados:
+      - Nome do projeto
+      - Senha do banco de dados
+      - Região (escolha a mais próxima)
+   5. Aguarde a criação (1-2 minutos)
+
+B. Obter Credenciais:
+   1. No painel do projeto, vá em Settings > API
+   2. Copie as seguintes informações:
+      - Project URL (VITE_SUPABASE_URL)
+      - anon public key (VITE_SUPABASE_ANON_KEY)
+
+C. Executar Migrations:
+   1. No Supabase, vá em SQL Editor
+   2. Clique em "New Query"
+   3. Cole o conteúdo do arquivo:
+      supabase/migrations/create_complete_database_structure.sql
+   4. Clique em "Run" ou pressione Ctrl+Enter
+   5. Verifique se todas as tabelas foram criadas em Table Editor
+
+IMPORTANTE: O script já inclui verificações para evitar duplicação de tabelas!
+Se você já tem algumas tabelas criadas, o script vai apenas adicionar as que faltam.
+
+==============================================
+3. VARIÁVEIS DE AMBIENTE
+==============================================
+
+Copie o arquivo .env.example para .env e configure:
+
+VITE_SUPABASE_URL=sua_url_do_supabase_aqui
+VITE_SUPABASE_ANON_KEY=sua_chave_anonima_aqui
+
+VITE_INSTAGRAM_APP_ID=seu_app_id_do_instagram
+VITE_INSTAGRAM_APP_SECRET=seu_app_secret_do_instagram
+VITE_INSTAGRAM_REDIRECT_URI=http://localhost:5173/auth/instagram/callback
+
+NUNCA compartilhe essas chaves publicamente!
+
+==============================================
+4. INSTALAÇÃO LOCAL
+==============================================
+
+A. Clonar/Baixar o Projeto:
+   git clone [seu-repositorio]
+   cd [nome-do-projeto]
+
+B. Instalar Dependências:
+   npm install
+
+C. Configurar Variáveis de Ambiente:
+   Edite o arquivo .env com suas credenciais
+
+D. Iniciar Servidor de Desenvolvimento:
+   npm run dev
+
+E. Abrir no Navegador:
+   http://localhost:5173
+
+F. Criar Primeira Conta:
+   1. Clique em "Criar Conta"
+   2. Preencha email e senha
+   3. Faça login
+
+==============================================
+5. ESTRUTURA DO BANCO DE DADOS
+==============================================
+
+TABELAS CRIADAS:
+
+1. connections
+   - Armazena conexões com redes sociais
+   - Campos: id, user_id, platform, platform_user_id,
+            platform_username, access_token, refresh_token,
+            token_expires_at, is_active, metadata,
+            created_at, updated_at
+
+2. automations
+   - Armazena automações criadas
+   - Campos: id, user_id, name, description, flow_data,
+            selected_platforms, is_active, trigger_type,
+            created_at, updated_at
+
+3. contacts
+   - Armazena contatos/leads
+   - Campos: id, user_id, platform, platform_user_id,
+            username, full_name, email, phone, tags,
+            custom_fields, auto_reply_enabled,
+            last_interaction, created_at, updated_at
+
+   IMPORTANTE: auto_reply_enabled controla se o contato
+   recebe respostas automáticas (true) ou apenas manuais (false)
+
+4. keywords
+   - Armazena palavras-chave para automações
+   - Campos: id, user_id, automation_id, keyword,
+            response_type, response_content, is_active,
+            created_at, updated_at
+
+5. messages
+   - Armazena mensagens enviadas e recebidas
+   - Campos: id, user_id, contact_id, automation_id,
+            platform, direction (inbound/outbound), content,
+            metadata, status, is_automated, created_at
+
+   IMPORTANTE: is_automated indica se a mensagem foi enviada
+   por automação (true) ou manualmente (false)
+
+6. broadcasts
+   - Armazena campanhas de broadcast
+   - Campos: id, user_id, name, platforms, message_content,
+            target_contacts, status, scheduled_at, sent_at,
+            created_at, updated_at
+
+SEGURANÇA (RLS - Row Level Security):
+- Todas as tabelas têm RLS habilitado
+- Cada usuário só acessa seus próprios dados
+- Políticas para SELECT, INSERT, UPDATE e DELETE
+
+ÍNDICES:
+- Criados automaticamente para otimização
+- Campos indexados: user_id, platform, contact_id, automation_id
+
+==============================================
+6. FUNCIONALIDADES IMPLEMENTADAS
+==============================================
+
+✓ AUTENTICAÇÃO
+  - Login com email/senha
+  - Registro de novos usuários
+  - Sessão persistente
+  - Logout seguro
+
+✓ DASHBOARD
+  - Visão geral do sistema
+  - Estatísticas em tempo real
+  - Acesso rápido às funcionalidades
+
+✓ CONEXÕES
+  - Instagram (OAuth 2.0)
+  - Facebook Messenger (preparado)
+  - WhatsApp (preparado)
+  - TikTok (preparado)
+  - Gerenciamento de múltiplas contas
+
+✓ AUTOMAÇÕES
+  - Criação de fluxos visuais
+  - Diferentes tipos de gatilhos
+  - Ativar/desativar automações
+  - Duplicar automações
+  - Templates prontos
+  - Editor de fluxo (Flow Editor)
+
+✓ CHAT AO VIVO
+  - Visualização de conversas em tempo real
+  - Envio de mensagens manuais
+  - Controle de resposta automática por contato
+  - Botão ON/OFF para automação individual
+  - Indicador de mensagens automáticas vs manuais
+  - Atualização em tempo real via Realtime
+
+CONTROLE DE AUTOMAÇÃO NO CHAT:
+  - Botão "Auto ON/OFF" ao lado de cada contato
+  - Verde = Automação ativa
+  - Cinza = Apenas respostas manuais
+  - Quando desligado, você assume o controle manual
+  - Quando ligado, automação volta a responder
+
+✓ CONTATOS
+  - Lista de todos os contatos
+  - Adicionar manualmente
+  - Importar de redes sociais
+  - Tags e campos customizados
+  - Filtros e busca
+
+✓ PALAVRAS-CHAVE
+  - Criar palavras-chave
+  - Configurar respostas
+  - Vincular a automações
+  - Ativar/desativar
+
+✓ BROADCASTS
+  - Envio em massa
+  - Agendamento
+  - Múltiplas plataformas
+  - Segmentação de contatos
+
+==============================================
+7. CONFIGURAÇÃO DO INSTAGRAM
+==============================================
+
+Para conectar o Instagram, você precisa:
+
+A. Criar App no Meta Developers:
+   1. Acesse https://developers.facebook.com
+   2. Vá em "Meus Apps" > "Criar App"
+   3. Escolha tipo "Consumidor"
+   4. Preencha informações do app
+   5. No painel, adicione produto "Instagram Basic Display"
+
+B. Configurar Instagram Basic Display:
+   1. Vá em Instagram Basic Display > Configurações básicas
+   2. Em "Valid OAuth Redirect URIs", adicione:
+      http://localhost:5173/auth/instagram/callback
+   3. Em "Deauthorize Callback URL", adicione:
+      http://localhost:5173/auth/instagram/deauthorize
+   4. Em "Data Deletion Request URL", adicione:
+      http://localhost:5173/auth/instagram/delete
+   5. Salve as alterações
+
+C. Obter Credenciais:
+   1. Copie o "Instagram App ID"
+   2. Copie o "Instagram App Secret"
+   3. Cole no arquivo .env
+
+D. Testar Conexão:
+   1. Na página Conexões, clique no card do Instagram
+   2. Será redirecionado para autorização do Instagram
+   3. Autorize o app
+   4. Será redirecionado de volta com a conexão ativa
+
+IMPORTANTE: Para ambiente de produção, você precisará:
+- Domínio próprio com HTTPS
+- Atualizar as URLs de callback
+- Submeter o app para revisão do Meta
+
+Consulte o arquivo INSTAGRAM_SETUP.md para mais detalhes.
+
+==============================================
+8. TROUBLESHOOTING
+==============================================
+
+PROBLEMA: Erro ao criar tabelas no Supabase
+SOLUÇÃO:
+- Verifique se todas as policies foram aplicadas
+- Execute o script novamente (ele é seguro para reexecutar)
+- Verifique logs de erro no SQL Editor
+
+PROBLEMA: "Failed to fetch" ao fazer login
+SOLUÇÃO:
+- Verifique se o VITE_SUPABASE_URL está correto
+- Verifique se o VITE_SUPABASE_ANON_KEY está correto
+- Certifique-se que não há espaços nas variáveis
+
+PROBLEMA: Instagram não conecta
+SOLUÇÃO:
+- Verifique as credenciais no .env
+- Verifique se as URLs de callback estão corretas
+- Certifique-se que o app está no modo de desenvolvimento
+- Verifique se você está usando uma conta de teste
+
+PROBLEMA: Chat não atualiza em tempo real
+SOLUÇÃO:
+- Verifique se o Supabase Realtime está habilitado
+- No Supabase: Database > Replication > Enable Realtime
+- Selecione a tabela "messages"
+
+PROBLEMA: Mensagens não aparecem
+SOLUÇÃO:
+- Verifique se há contatos cadastrados
+- Verifique as policies de RLS no Supabase
+- Teste com o SQL Editor se consegue inserir dados
+
+PROBLEMA: Build falha
+SOLUÇÃO:
+- Delete node_modules e package-lock.json
+- Execute: npm install
+- Execute: npm run build
+- Verifique erros de TypeScript
+
+==============================================
+DEPLOY EM PRODUÇÃO
+==============================================
+
+Para deploy, recomendamos:
+
+1. Vercel / Netlify (Frontend):
+   - Conecte seu repositório GitHub
+   - Configure as variáveis de ambiente
+   - Deploy automático a cada push
+
+2. Supabase (Backend/Database):
+   - Já está em produção
+   - Configure custom domain se desejar
+   - Ative backups automáticos
+
+3. Variáveis de Ambiente de Produção:
+   - Use URLs de produção
+   - Atualize callbacks do Instagram
+   - Use secrets para chaves sensíveis
+
+==============================================
+PRÓXIMOS PASSOS
+==============================================
+
+Após a instalação básica, você pode:
+
+1. Conectar suas redes sociais
+2. Criar sua primeira automação
+3. Importar ou adicionar contatos
+4. Configurar palavras-chave
+5. Testar o chat ao vivo
+6. Criar um broadcast
+
+==============================================
+SUPORTE
+==============================================
+
+Para dúvidas ou problemas:
+- Verifique a documentação do Supabase
+- Consulte o README.md do projeto
+- Revise os arquivos FLOW_EDITOR_GUIDE.md e INSTAGRAM_SETUP.md
+
+==============================================
+
+Sistema desenvolvido com:
+- React + TypeScript
+- Vite
+- Tailwind CSS
+- Supabase (PostgreSQL + Auth + Realtime)
+- React Router
+- React Flow (Editor visual)
+- Lucide Icons
+
+==============================================

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Search, Filter, Key, TrendingUp, Plus, Edit2, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { NewKeywordModal } from '../components/keywords/NewKeywordModal';
 import { EditKeywordModal } from '../components/keywords/EditKeywordModal';
 
@@ -329,7 +329,6 @@ export const Keywords = () => {
         />
       )}
 
-      <Toaster position="top-right" />
     </div>
   );
 };

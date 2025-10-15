@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginPage } from './components/auth/LoginPage';
 import { Layout } from './components/layout/Layout';
@@ -77,14 +78,19 @@ const AppRoutes = () => {
             <Layout>
               <Routes>
                 <Route path="/" element={<Dashboard />} />
+                <Route path="/contatos" element={<Contacts />} />
                 <Route path="/contacts" element={<Contacts />} />
+                <Route path="/automacoes" element={<Automations />} />
                 <Route path="/automations" element={<Automations />} />
+                <Route path="/automacoes/:id" element={<FlowEditor />} />
+                <Route path="/automations/:id" element={<FlowEditor />} />
                 <Route path="/automations/basic" element={<Automations />} />
                 <Route path="/automations/keywords" element={<Keywords />} />
                 <Route path="/automations/sequences" element={<Automations />} />
                 <Route path="/automations/rules" element={<Automations />} />
                 <Route path="/chat" element={<Chat />} />
                 <Route path="/broadcasts" element={<Broadcasts />} />
+                <Route path="/conexoes" element={<Connections />} />
                 <Route path="/connections" element={<Connections />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
@@ -102,6 +108,26 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <AppRoutes />
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            success: {
+              duration: 3000,
+              style: {
+                background: '#10b981',
+                color: '#fff',
+              },
+            },
+            error: {
+              duration: 5000,
+              style: {
+                background: '#ef4444',
+                color: '#fff',
+              },
+            },
+          }}
+        />
       </BrowserRouter>
     </AuthProvider>
   );

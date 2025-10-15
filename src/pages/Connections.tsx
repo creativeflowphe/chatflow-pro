@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react';
 import { Plus, Instagram, Facebook, MessageCircle, Music } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { initiateInstagramOAuth, disconnectInstagram } from '../services/instagramOAuth';
 
 interface Connection {
   id: string;
   platform: string;
-  account_name: string;
-  status: string;
+  platform_username: string;
+  is_active: boolean;
   created_at: string;
 }
 
@@ -20,6 +20,7 @@ export const Connections = () => {
   const [selectedPlatform, setSelectedPlatform] = useState<string>('');
   const [accountName, setAccountName] = useState('');
   const [loading, setLoading] = useState(true);
+  const [connecting, setConnecting] = useState(false);
 
   const platforms = [
     { id: 'instagram', name: 'Instagram', icon: Instagram, color: 'bg-pink-500' },
@@ -47,34 +48,94 @@ export const Connections = () => {
     setLoading(false);
   };
 
-  const connectPlatform = async () => {
-    if (!user || !selectedPlatform) return;
+  const connectPlatform = async (e: React.FormEvent, platform: string) => {
+    e.preventDefault();
+
+    if (!user) {
+      toast.error('Você precisa estar autenticado');
+      return;
+    }
+
+    if (!platform) {
+      toast.error('Selecione uma plataforma');
+      return;
+    }
+
+    setConnecting(true);
 
     try {
-      if (selectedPlatform === 'instagram') {
+      if (platform === 'instagram') {
         await initiateInstagramOAuth(user.id);
       } else {
-        toast.error('Esta plataforma ainda não está disponível');
+        const existingConnection = connections.find(c => c.platform === platform);
+
+        if (existingConnection) {
+          toast.error('Conexão já existe! Edite a conexão existente.');
+          setConnecting(false);
+          return;
+        }
+
+        const { error } = await supabase
+          .from('connections')
+          .insert([
+            {
+              user_id: user.id,
+              platform,
+              platform_user_id: `${platform}_user_${Date.now()}`,
+              platform_username: `${platform}_conta_teste`,
+              is_active: true,
+              access_token: `fake_token_${platform}`,
+            },
+          ]);
+
+        if (error) {
+          console.error('Erro ao conectar:', error);
+          if (error.code === '23505') {
+            toast.error('Conexão já existe! Edite a conexão existente.');
+          } else {
+            toast.error(`Erro ao conectar: ${error.message}`);
+          }
+        } else {
+          toast.success(`${getPlatformName(platform)} conectado com sucesso!`);
+          await loadConnections();
+        }
       }
     } catch (error: any) {
+      console.error('Erro ao conectar plataforma:', error);
       toast.error(error.message || 'Erro ao conectar plataforma');
+    } finally {
+      setConnecting(false);
     }
   };
 
   const handleDisconnect = async (connectionId: string, platform: string) => {
     if (!confirm('Deseja realmente desconectar esta conta?')) return;
 
-    let success = false;
+    try {
+      if (platform === 'instagram') {
+        const success = await disconnectInstagram(connectionId);
+        if (!success) {
+          toast.error('Erro ao desconectar conta');
+          return;
+        }
+      } else {
+        const { error } = await supabase
+          .from('connections')
+          .delete()
+          .eq('id', connectionId);
 
-    if (platform === 'instagram') {
-      success = await disconnectInstagram(connectionId);
-    }
+        if (error) {
+          console.error('Erro ao desconectar:', error);
+          toast.error('Erro ao desconectar conta');
+          return;
+        }
+      }
 
-    if (success) {
       toast.success('Conta desconectada com sucesso!');
-      loadConnections();
-    } else {
-      toast.error('Erro ao desconectar conta');
+      await loadConnections();
+    } catch (error: any) {
+      console.error('Erro ao desconectar:', error);
+      toast.error(error.message || 'Erro ao desconectar conta');
     }
   };
 
@@ -110,15 +171,15 @@ export const Connections = () => {
           return (
             <button
               key={platform.id}
-              onClick={() => {
-                if (!connected) {
+              onClick={(e) => {
+                if (!connected && !connecting) {
                   setSelectedPlatform(platform.id);
-                  connectPlatform();
+                  connectPlatform(e, platform.id);
                 }
               }}
-              disabled={!!connected}
+              disabled={!!connected || connecting}
               className={`bg-white rounded-xl shadow-sm border-2 p-6 text-center hover:shadow-md transition-all ${
-                connected ? 'border-green-500 cursor-default' : 'border-gray-200 hover:border-blue-300'
+                connected ? 'border-green-500 cursor-default' : connecting ? 'border-blue-300 opacity-50 cursor-wait' : 'border-gray-200 hover:border-blue-300'
               }`}
             >
               <div className={`${platform.color} w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-3`}>
@@ -128,6 +189,11 @@ export const Connections = () => {
               {connected ? (
                 <span className="inline-block px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
                   Conectado
+                </span>
+              ) : connecting && selectedPlatform === platform.id ? (
+                <span className="inline-flex items-center space-x-2 px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-700"></div>
+                  <span>Conectando...</span>
                 </span>
               ) : (
                 <span className="inline-block px-3 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">
@@ -174,19 +240,19 @@ export const Connections = () => {
                       <h3 className="font-semibold text-gray-900">
                         {getPlatformName(connection.platform)}
                       </h3>
-                      <p className="text-sm text-gray-600">{connection.account_name}</p>
+                      <p className="text-sm text-gray-600">@{connection.platform_username}</p>
                     </div>
                   </div>
 
                   <div className="flex items-center space-x-4">
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        connection.status === 'active'
+                        connection.is_active
                           ? 'bg-green-100 text-green-700'
                           : 'bg-gray-100 text-gray-700'
                       }`}
                     >
-                      {connection.status === 'active' ? 'Ativo' : 'Inativo'}
+                      {connection.is_active ? 'Ativo' : 'Inativo'}
                     </span>
                     <button
                       onClick={() => handleDisconnect(connection.id, connection.platform)}
@@ -203,7 +269,6 @@ export const Connections = () => {
       )}
 
 
-      <Toaster position="top-right" />
     </div>
   );
 };

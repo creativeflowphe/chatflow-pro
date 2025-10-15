@@ -159,33 +159,49 @@ export const TemplatesModal = ({ isOpen, onClose, onSuccess }: TemplatesModalPro
   ];
 
   const handleCreateFromTemplate = async (template: Template) => {
-    if (!user) return;
+    if (!user) {
+      toast.error('Você precisa estar autenticado');
+      return;
+    }
 
-    const { data, error } = await supabase
-      .from('automations')
-      .insert({
-        user_id: user.id,
-        name: template.name,
-        description: template.description,
-        type: template.type,
-        trigger_type: template.trigger_type,
-        flow_data: template.flow_data,
-        status: 'inactive',
-        runs: 0,
-        ctr: 0,
-      })
-      .select()
-      .maybeSingle();
+    const loadingToast = toast.loading('Criando automação...');
 
-    if (error) {
-      console.error('Erro ao criar automação do template:', error);
-      toast.error(`Erro ao criar automação: ${error.message}`);
-    } else if (data) {
-      toast.success(`Template "${template.name}" criado com sucesso!`);
-      onSuccess();
-      onClose();
-    } else {
-      toast.error('Erro ao criar automação do template');
+    try {
+      const { data, error } = await supabase
+        .from('automations')
+        .insert({
+          user_id: user.id,
+          name: template.name,
+          description: template.description,
+          trigger_type: template.trigger_type,
+          flow_data: template.flow_data,
+          selected_platforms: [],
+          is_active: false,
+        })
+        .select()
+        .maybeSingle();
+
+      toast.dismiss(loadingToast);
+
+      if (error) {
+        console.error('Erro ao criar automação do template:', error);
+        if (error.code === '23505') {
+          toast.error('Já existe uma automação com esse nome');
+        } else {
+          toast.error(`Erro ao criar automação: ${error.message}`);
+        }
+        return;
+      }
+
+      if (data) {
+        toast.success(`Template "${template.name}" criado com sucesso!`);
+        onSuccess();
+        onClose();
+      }
+    } catch (error: any) {
+      toast.dismiss(loadingToast);
+      console.error('Erro inesperado:', error);
+      toast.error(error.message || 'Erro ao criar automação do template');
     }
   };
 
