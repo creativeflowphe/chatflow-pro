@@ -3,13 +3,15 @@ import { X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import toast from 'react-hot-toast';
 
 interface NewAutomationModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess: () => void;
 }
 
-export const NewAutomationModal = ({ isOpen, onClose }: NewAutomationModalProps) => {
+export const NewAutomationModal = ({ isOpen, onClose, onSuccess }: NewAutomationModalProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [name, setName] = useState('');
@@ -51,8 +53,12 @@ export const NewAutomationModal = ({ isOpen, onClose }: NewAutomationModalProps)
     setLoading(false);
 
     if (!error && data) {
+      toast.success('Automação criada com sucesso!');
+      onSuccess();
       onClose();
       navigate(`/automations/editor/${data.id}`);
+    } else {
+      toast.error('Erro ao criar automação');
     }
   };
 
