@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Plus, Instagram, Facebook, MessageCircle, Music } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import toast, { Toaster } from 'react-hot-toast';
 
 interface Connection {
   id: string;
@@ -57,10 +58,17 @@ export const Connections = () => {
     });
 
     if (!error) {
+      toast.success(`${getPlatformName(selectedPlatform)} conectado com sucesso!`);
       setShowModal(false);
       setSelectedPlatform('');
       setAccountName('');
       loadConnections();
+    } else {
+      if (error.code === '23505') {
+        toast.error('Conexão já existe, edite a existente!');
+      } else {
+        toast.error('Erro ao conectar plataforma');
+      }
     }
   };
 
@@ -235,6 +243,8 @@ export const Connections = () => {
           </div>
         </div>
       )}
+
+      <Toaster position="top-right" />
     </div>
   );
 };
