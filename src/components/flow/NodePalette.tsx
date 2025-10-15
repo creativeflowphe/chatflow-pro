@@ -1,4 +1,4 @@
-import { Zap, MessageSquare, GitBranch, Cog, Tag, Send, Link, Phone } from 'lucide-react';
+import { Zap, MessageSquare, GitBranch, Tag, Send, Link, Radio } from 'lucide-react';
 
 interface NodePaletteProps {
   onDragStart: (event: React.DragEvent, nodeType: string) => void;
@@ -30,6 +30,7 @@ export const NodePalette = ({ onDragStart }: NodePaletteProps) => {
         { type: 'action_tag', label: 'Adicionar Tag', icon: Tag, color: 'purple' },
         { type: 'action_api', label: 'Chamada API', icon: Link, color: 'purple' },
         { type: 'action_sequence', label: 'Iniciar Sequência', icon: Send, color: 'purple' },
+        { type: 'broadcast', label: 'Broadcast', icon: Radio, color: 'purple' },
       ],
     },
   ];
