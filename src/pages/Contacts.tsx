@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Search, Plus, Download, Upload, Tag } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { NewContactModal } from '../components/contacts/NewContactModal';
+import { Toaster } from 'react-hot-toast';
 
 interface Contact {
   id: string;
@@ -17,6 +19,7 @@ export const Contacts = () => {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showNewContactModal, setShowNewContactModal] = useState(false);
 
   useEffect(() => {
     loadContacts();
@@ -63,7 +66,10 @@ export const Contacts = () => {
             <Upload className="w-4 h-4" />
             <span>Importar CSV</span>
           </button>
-          <button className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+          <button
+            onClick={() => setShowNewContactModal(true)}
+            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+          >
             <Plus className="w-4 h-4" />
             <span>Novo Contato</span>
           </button>
@@ -173,6 +179,14 @@ export const Contacts = () => {
           </table>
         </div>
       </div>
+
+      <NewContactModal
+        isOpen={showNewContactModal}
+        onClose={() => setShowNewContactModal(false)}
+        onSuccess={loadContacts}
+      />
+
+      <Toaster position="top-right" />
     </div>
   );
 };
