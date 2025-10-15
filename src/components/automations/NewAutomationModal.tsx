@@ -46,13 +46,18 @@ export const NewAutomationModal = ({ isOpen, onClose, onSuccess }: NewAutomation
           edges: [],
         },
         status: 'inactive',
+        runs: 0,
+        ctr: 0,
       })
       .select()
-      .single();
+      .maybeSingle();
 
     setLoading(false);
 
-    if (!error && data) {
+    if (error) {
+      console.error('Erro ao criar automação:', error);
+      toast.error(`Erro ao criar automação: ${error.message}`);
+    } else if (data) {
       toast.success('Automação criada com sucesso!');
       onSuccess();
       onClose();

@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Search, Filter, Zap, Clock, TrendingUp } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import toast, { Toaster } from 'react-hot-toast';
+import { NewAutomationModal } from '../components/automations/NewAutomationModal';
+import { TemplatesModal } from '../components/automations/TemplatesModal';
 
 interface Automation {
   id: string;
@@ -18,10 +21,31 @@ interface Automation {
 
 export const Automations = () => {
   const { user } = useAuth();
+  const location = useLocation();
   const [automations, setAutomations] = useState<Automation[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [loading, setLoading] = useState(true);
+  const [showNewModal, setShowNewModal] = useState(false);
+  const [showTemplatesModal, setShowTemplatesModal] = useState(false);
+
+  const getPageTitle = () => {
+    const path = location.pathname;
+    if (path.includes('/basic')) return 'Automações Básicas';
+    if (path.includes('/keywords')) return 'Palavras-chave';
+    if (path.includes('/sequences')) return 'Sequências';
+    if (path.includes('/rules')) return 'Regras';
+    return 'Minhas Automações';
+  };
+
+  const getPageDescription = () => {
+    const path = location.pathname;
+    if (path.includes('/basic')) return 'Respostas automáticas simples para mensagens';
+    if (path.includes('/keywords')) return 'Automações acionadas por palavras-chave específicas';
+    if (path.includes('/sequences')) return 'Sequências de mensagens automatizadas com delays';
+    if (path.includes('/rules')) return 'Regras personalizadas avançadas';
+    return 'Gerencie suas automações de chat';
+  };
 
   useEffect(() => {
     loadAutomations();
@@ -86,9 +110,26 @@ export const Automations = () => {
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Minhas Automações</h1>
-        <p className="text-gray-600 mt-2">Gerencie suas automações de chat</p>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">{getPageTitle()}</h1>
+          <p className="text-gray-600 mt-2">{getPageDescription()}</p>
+        </div>
+        <div className="flex items-center space-x-3">
+          <button
+            onClick={() => setShowTemplatesModal(true)}
+            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-2"
+          >
+            <Zap className="w-5 h-5" />
+            <span>Templates</span>
+          </button>
+          <button
+            onClick={() => setShowNewModal(true)}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center space-x-2"
+          >
+            <span>Nova Automação</span>
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">

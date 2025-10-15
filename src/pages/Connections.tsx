@@ -3,6 +3,7 @@ import { Plus, Instagram, Facebook, MessageCircle, Music } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import toast, { Toaster } from 'react-hot-toast';
+import { initiateInstagramOAuth, disconnectInstagram } from '../services/instagramOAuth';
 
 interface Connection {
   id: string;
@@ -47,28 +48,33 @@ export const Connections = () => {
   };
 
   const connectPlatform = async () => {
-    if (!user || !selectedPlatform || !accountName.trim()) return;
+    if (!user || !selectedPlatform) return;
 
-    const { error } = await supabase.from('connections').insert({
-      user_id: user.id,
-      platform: selectedPlatform,
-      account_name: accountName.trim(),
-      access_token: 'stub_token_' + Date.now(),
-      status: 'active',
-    });
+    try {
+      if (selectedPlatform === 'instagram') {
+        await initiateInstagramOAuth(user.id);
+      } else {
+        toast.error('Esta plataforma ainda não está disponível');
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Erro ao conectar plataforma');
+    }
+  };
 
-    if (!error) {
-      toast.success(`${getPlatformName(selectedPlatform)} conectado com sucesso!`);
-      setShowModal(false);
-      setSelectedPlatform('');
-      setAccountName('');
+  const handleDisconnect = async (connectionId: string, platform: string) => {
+    if (!confirm('Deseja realmente desconectar esta conta?')) return;
+
+    let success = false;
+
+    if (platform === 'instagram') {
+      success = await disconnectInstagram(connectionId);
+    }
+
+    if (success) {
+      toast.success('Conta desconectada com sucesso!');
       loadConnections();
     } else {
-      if (error.code === '23505') {
-        toast.error('Conexão já existe, edite a existente!');
-      } else {
-        toast.error('Erro ao conectar plataforma');
-      }
+      toast.error('Erro ao desconectar conta');
     }
   };
 
@@ -107,11 +113,12 @@ export const Connections = () => {
               onClick={() => {
                 if (!connected) {
                   setSelectedPlatform(platform.id);
-                  setShowModal(true);
+                  connectPlatform();
                 }
               }}
+              disabled={!!connected}
               className={`bg-white rounded-xl shadow-sm border-2 p-6 text-center hover:shadow-md transition-all ${
-                connected ? 'border-green-500' : 'border-gray-200'
+                connected ? 'border-green-500 cursor-default' : 'border-gray-200 hover:border-blue-300'
               }`}
             >
               <div className={`${platform.color} w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-3`}>
@@ -181,7 +188,10 @@ export const Connections = () => {
                     >
                       {connection.status === 'active' ? 'Ativo' : 'Inativo'}
                     </span>
-                    <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm">
+                    <button
+                      onClick={() => handleDisconnect(connection.id, connection.platform)}
+                      className="px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors text-sm"
+                    >
                       Desconectar
                     </button>
                   </div>
@@ -192,57 +202,6 @@ export const Connections = () => {
         </div>
       )}
 
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">
-                Conectar {getPlatformName(selectedPlatform)}
-              </h2>
-            </div>
-
-            <div className="p-6 space-y-4">
-              <p className="text-sm text-gray-600">
-                Esta é uma demonstração. Em produção, você seria redirecionado para autenticar
-                com OAuth.
-              </p>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Nome da Conta
-                </label>
-                <input
-                  type="text"
-                  value={accountName}
-                  onChange={(e) => setAccountName(e.target.value)}
-                  placeholder="Ex: @minha_conta"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end space-x-3 p-6 border-t border-gray-200">
-              <button
-                onClick={() => {
-                  setShowModal(false);
-                  setSelectedPlatform('');
-                  setAccountName('');
-                }}
-                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={connectPlatform}
-                disabled={!accountName.trim()}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Conectar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       <Toaster position="top-right" />
     </div>

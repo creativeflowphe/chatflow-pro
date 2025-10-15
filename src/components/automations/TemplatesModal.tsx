@@ -175,14 +175,17 @@ export const TemplatesModal = ({ isOpen, onClose, onSuccess }: TemplatesModalPro
         ctr: 0,
       })
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
-      toast.error('Erro ao criar automação do template');
-    } else {
+      console.error('Erro ao criar automação do template:', error);
+      toast.error(`Erro ao criar automação: ${error.message}`);
+    } else if (data) {
       toast.success(`Template "${template.name}" criado com sucesso!`);
       onSuccess();
       onClose();
+    } else {
+      toast.error('Erro ao criar automação do template');
     }
   };
 
