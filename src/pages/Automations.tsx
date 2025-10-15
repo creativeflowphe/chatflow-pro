@@ -191,6 +191,20 @@ export const Automations = () => {
           ))}
         </div>
       )}
+
+      <NewAutomationModal
+        isOpen={showNewModal}
+        onClose={() => setShowNewModal(false)}
+        onSuccess={loadAutomations}
+      />
+
+      <TemplatesModal
+        isOpen={showTemplatesModal}
+        onClose={() => setShowTemplatesModal(false)}
+        onSuccess={loadAutomations}
+      />
+
+      <Toaster position="top-right" />
     </div>
   );
 };
