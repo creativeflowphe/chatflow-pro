@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Search, MessageCircle, User, Send } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import toast, { Toaster } from 'react-hot-toast';
 
 interface Conversation {
   id: string;
@@ -83,6 +84,8 @@ export const Chat = () => {
     if (!error) {
       setMessageInput('');
       loadMessages(selectedConversation);
+    } else {
+      toast.error('Erro ao enviar mensagem');
     }
   };
 
@@ -248,6 +251,8 @@ export const Chat = () => {
           </div>
         )}
       </div>
+
+      <Toaster position="top-right" />
     </div>
   );
 };

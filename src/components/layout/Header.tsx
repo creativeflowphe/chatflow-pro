@@ -1,17 +1,15 @@
-import { MessageSquare, Plus, Bell, User } from 'lucide-react';
+import { MessageSquare, Bell, User } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
-interface HeaderProps {
-  onNewAutomation: () => void;
-}
-
-export const Header = ({ onNewAutomation }: HeaderProps) => {
+export const Header = () => {
   const { signOut } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <header className="bg-white border-b border-gray-200 h-16 fixed top-0 left-0 right-0 z-30">
       <div className="h-full flex items-center justify-between px-6">
-        <div className="flex items-center">
+        <div className="flex items-center cursor-pointer" onClick={() => navigate('/')}>
           <div className="bg-blue-600 p-2 rounded-lg">
             <MessageSquare className="w-6 h-6 text-white" />
           </div>
@@ -19,13 +17,6 @@ export const Header = ({ onNewAutomation }: HeaderProps) => {
         </div>
 
         <div className="flex items-center space-x-4">
-          <button
-            onClick={onNewAutomation}
-            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Nova Automação</span>
-          </button>
 
           <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative">
             <Bell className="w-5 h-5 text-gray-600" />

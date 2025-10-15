@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Plus, Send, Calendar, Users } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import toast, { Toaster } from 'react-hot-toast';
 
 interface Broadcast {
   id: string;
@@ -60,11 +61,14 @@ export const Broadcasts = () => {
     });
 
     if (!error) {
+      toast.success('Disparo criado com sucesso!');
       setShowModal(false);
       setName('');
       setContent('');
       setTags('');
       loadBroadcasts();
+    } else {
+      toast.error('Erro ao criar disparo');
     }
   };
 
@@ -249,6 +253,8 @@ export const Broadcasts = () => {
           </div>
         </div>
       )}
+
+      <Toaster position="top-right" />
     </div>
   );
 };
