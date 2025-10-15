@@ -19,7 +19,9 @@ import { TriggerNode } from '../components/flow/nodes/TriggerNode';
 import { MessageNode } from '../components/flow/nodes/MessageNode';
 import { ConditionNode } from '../components/flow/nodes/ConditionNode';
 import { ActionNode } from '../components/flow/nodes/ActionNode';
+import { BroadcastNode } from '../components/flow/nodes/BroadcastNode';
 import { NodePalette } from '../components/flow/NodePalette';
+import toast, { Toaster } from 'react-hot-toast';
 
 const nodeTypes = {
   trigger: TriggerNode,
@@ -28,6 +30,7 @@ const nodeTypes = {
   action_tag: ActionNode,
   action_api: ActionNode,
   action_sequence: ActionNode,
+  broadcast: BroadcastNode,
 };
 
 export const FlowEditor = () => {
@@ -125,6 +128,7 @@ export const FlowEditor = () => {
       action_tag: 'Adicionar tag',
       action_api: 'Chamada API',
       action_sequence: 'Iniciar sequência',
+      broadcast: 'Enviar Broadcast',
     };
     return labels[type] || type;
   };
@@ -137,6 +141,7 @@ export const FlowEditor = () => {
       action_tag: { action: 'Adicionar tag', details: 'cliente-interessado' },
       action_api: { action: 'Chamada API', details: 'POST /api/webhook' },
       action_sequence: { action: 'Iniciar sequência', details: 'Sequência de boas-vindas' },
+      broadcast: { content: 'Mensagem broadcast', tags: ['todos'] },
     };
     return defaults[type] || {};
   };
@@ -157,7 +162,9 @@ export const FlowEditor = () => {
     setSaving(false);
 
     if (!error) {
-      alert('Automação salva com sucesso!');
+      toast.success('Automação salva com sucesso!');
+    } else {
+      toast.error('Erro ao salvar automação');
     }
   };
 
@@ -173,6 +180,9 @@ export const FlowEditor = () => {
 
     if (!error) {
       setAutomation({ ...automation, status: newStatus });
+      toast.success(`Automação ${newStatus === 'active' ? 'ativada' : 'desativada'} com sucesso!`);
+    } else {
+      toast.error('Erro ao alterar status da automação');
     }
   };
 
@@ -257,6 +267,8 @@ export const FlowEditor = () => {
 
         <NodePalette onDragStart={onDragStart} />
       </div>
+
+      <Toaster position="top-right" />
     </div>
   );
 };
