@@ -1,6 +1,9 @@
 import { supabase } from '../lib/supabase';
 
-const INSTAGRAM_APP_ID = import.meta.env.VITE_INSTAGRAM_APP_ID;
+const getInstagramAppId = (): string | undefined => {
+  return import.meta.env.VITE_INSTAGRAM_APP_ID;
+};
+
 const REDIRECT_URI = `${window.location.origin}/auth/instagram/callback`;
 
 export const generateRandomState = (): string => {
@@ -10,8 +13,10 @@ export const generateRandomState = (): string => {
 };
 
 export const initiateInstagramOAuth = async (userId: string): Promise<void> => {
+  const INSTAGRAM_APP_ID = getInstagramAppId();
+
   if (!INSTAGRAM_APP_ID) {
-    throw new Error('Instagram App ID não configurado. Configure VITE_INSTAGRAM_APP_ID no arquivo .env');
+    throw new Error('Instagram App ID não configurado. Por favor, configure a variável de ambiente VITE_INSTAGRAM_APP_ID');
   }
 
   const state = generateRandomState();
@@ -70,10 +75,10 @@ export const handleInstagramCallback = async (
     const { error: connectionError } = await supabase.from('connections').insert({
       user_id: oauthState.user_id,
       platform: 'instagram',
-      account_name: username,
-      account_id: user_id,
+      platform_user_id: user_id,
+      platform_username: username,
       access_token,
-      status: 'active',
+      is_active: true,
       metadata: { username },
     });
 
