@@ -2,9 +2,12 @@ import { useState } from 'react';
 import { Handle, Position, useReactFlow } from 'reactflow';
 import { Zap, Copy, Trash2, Edit2, X, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useNodeTheme } from '../../../hooks/useNodeTheme';
 
 export const TriggerNode = ({ data, id }: any) => {
   const { setNodes, getNodes } = useReactFlow();
+  const { isDark, getNodeClasses } = useNodeTheme();
+  const classes = getNodeClasses('blue');
   const [isEditing, setIsEditing] = useState(false);
   const [editKeywords, setEditKeywords] = useState(data.keywords?.join(', ') || '');
   const [showActions, setShowActions] = useState(false);
@@ -56,12 +59,12 @@ export const TriggerNode = ({ data, id }: any) => {
 
   return (
     <div
-      className="bg-white rounded-lg shadow-lg border-2 border-blue-500 min-w-[200px] relative group"
+      className={`rounded-lg shadow-lg border-2 min-w-[200px] relative group ${isDark ? 'bg-gray-800 border-blue-600' : 'bg-white border-blue-500'}`}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
       {showActions && (
-        <div className="absolute -top-10 right-0 flex items-center space-x-1 bg-white rounded-lg shadow-lg border border-gray-200 p-1">
+        <div className={`absolute -top-10 right-0 flex items-center space-x-1 rounded-lg shadow-lg border p-1 ${classes.actionBar}`}>
           <button
             onClick={() => setIsEditing(!isEditing)}
             className="p-1.5 hover:bg-blue-50 rounded transition-colors"
@@ -88,12 +91,12 @@ export const TriggerNode = ({ data, id }: any) => {
 
       <div className="p-4">
         <div className="flex items-center space-x-2 mb-2">
-          <div className="bg-blue-100 p-2 rounded-lg">
-            <Zap className="w-4 h-4 text-blue-600" />
+          <div className={`p-2 rounded-lg ${isDark ? 'bg-blue-900/50' : 'bg-blue-100'}`}>
+            <Zap className={`w-4 h-4 ${isDark ? 'text-blue-400' : 'text-blue-600'}`} />
           </div>
-          <div className="font-semibold text-gray-900">Gatilho</div>
+          <div className={`font-semibold ${classes.headerText}`}>Gatilho</div>
         </div>
-        <div className="text-sm text-gray-600 mb-2">
+        <div className={`text-sm mb-2 ${classes.text}`}>
           {data.label || 'Quando usuário envia mensagem'}
         </div>
 
@@ -103,7 +106,7 @@ export const TriggerNode = ({ data, id }: any) => {
               type="text"
               value={editKeywords}
               onChange={(e) => setEditKeywords(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:border-transparent ${classes.input}`}
               placeholder="oi, olá, help (separadas por vírgula)"
               autoFocus
             />
@@ -129,7 +132,7 @@ export const TriggerNode = ({ data, id }: any) => {
           </div>
         ) : (
           data.keywords && (
-            <div className="text-xs text-gray-500">
+            <div className={`text-xs ${classes.textSecondary}`}>
               Palavras-chave: {data.keywords.join(', ')}
             </div>
           )

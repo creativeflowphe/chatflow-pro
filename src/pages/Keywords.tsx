@@ -132,8 +132,8 @@ export const Keywords = () => {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Palavras-chave</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-3xl font-bold text-[rgb(var(--color-text-primary))]">Palavras-chave</h1>
+          <p className="text-[rgb(var(--color-text-secondary))] mt-2">
             Configure respostas automáticas baseadas em palavras-chave específicas
           </p>
         </div>
@@ -146,7 +146,7 @@ export const Keywords = () => {
         </button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
+      <div className="bg-[rgb(var(--color-bg-secondary))] rounded-xl shadow-sm border border-[rgb(var(--color-border))] mb-6 transition-colors duration-200">
         <div className="p-4 flex items-center space-x-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -155,7 +155,7 @@ export const Keywords = () => {
               placeholder="Buscar palavras-chave..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-[rgb(var(--color-border))] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[rgb(var(--color-bg-secondary))] text-[rgb(var(--color-text-primary))]"
             />
           </div>
 
@@ -164,7 +164,7 @@ export const Keywords = () => {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-4 py-2 border border-[rgb(var(--color-border))] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[rgb(var(--color-bg-secondary))] text-[rgb(var(--color-text-primary))]"
             >
               <option value="all">Todos os Status</option>
               <option value="active">Ativo</option>
@@ -179,14 +179,14 @@ export const Keywords = () => {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
         </div>
       ) : filteredKeywords.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+        <div className="bg-[rgb(var(--color-bg-secondary))] rounded-xl shadow-sm border border-[rgb(var(--color-border))] p-12 text-center transition-colors duration-200">
           <Key className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          <h3 className="text-xl font-semibold text-[rgb(var(--color-text-primary))] mb-2">
             {searchTerm || statusFilter !== 'all'
               ? 'Nenhuma palavra-chave encontrada'
               : 'Nenhuma palavra-chave configurada'}
           </h3>
-          <p className="text-gray-600 mb-4">
+          <p className="text-[rgb(var(--color-text-secondary))] mb-4">
             {searchTerm || statusFilter !== 'all'
               ? 'Tente ajustar seus filtros de busca'
               : 'Configure palavras-chave para acionar respostas automáticas'}
@@ -206,12 +206,12 @@ export const Keywords = () => {
           {filteredKeywords.map((keyword) => (
             <div
               key={keyword.id}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
+              className="bg-[rgb(var(--color-bg-secondary))] rounded-xl shadow-sm border border-[rgb(var(--color-border))] hover:shadow-md transition-all duration-200"
             >
               <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900">{keyword.name}</h3>
+                    <h3 className="text-lg font-semibold text-[rgb(var(--color-text-primary))]">{keyword.name}</h3>
                     <div className="flex items-center space-x-2 mt-2">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                         {getMatchTypeLabel(keyword.match_type)}

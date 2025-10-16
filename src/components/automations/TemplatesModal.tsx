@@ -209,19 +209,19 @@ export const TemplatesModal = ({ isOpen, onClose, onSuccess }: TemplatesModalPro
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Templates de Automação</h2>
-            <p className="text-sm text-gray-500 mt-1">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Templates de Automação</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               Comece rápido com templates prontos para usar
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           </button>
         </div>
 
@@ -231,21 +231,21 @@ export const TemplatesModal = ({ isOpen, onClose, onSuccess }: TemplatesModalPro
             return (
               <div
                 key={template.id}
-                className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all"
+                className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-md transition-all bg-white dark:bg-gray-750"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-3 flex-1">
-                    <div className="p-3 bg-blue-50 rounded-lg">
-                      <Icon className="w-6 h-6 text-blue-600" />
+                    <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                      <Icon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900">{template.name}</h3>
-                      <p className="text-sm text-gray-600 mt-1">{template.description}</p>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{template.name}</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{template.description}</p>
                       <div className="flex items-center space-x-4 mt-3">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300">
                           {template.flow_data.nodes.length} nós
                         </span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
                           {template.type === 'sequence' ? 'Sequência' : 'Resposta Automática'}
                         </span>
                       </div>
@@ -263,8 +263,8 @@ export const TemplatesModal = ({ isOpen, onClose, onSuccess }: TemplatesModalPro
           })}
         </div>
 
-        <div className="p-6 border-t border-gray-200 bg-gray-50">
-          <p className="text-sm text-gray-600 text-center">
+        <div className="p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+          <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
             Os templates criados iniciarão em modo inativo. Edite e ative-os quando estiver pronto.
           </p>
         </div>

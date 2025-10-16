@@ -83,39 +83,39 @@ export const Dashboard = () => {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Início</h1>
-        <p className="text-gray-600 mt-2">Visão geral das suas automações</p>
+        <h1 className="text-3xl font-bold text-[rgb(var(--color-text-primary))]">Início</h1>
+        <p className="text-[rgb(var(--color-text-secondary))] mt-2">Visão geral das suas automações</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statCards.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={stat.label} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div key={stat.label} className="bg-[rgb(var(--color-bg-secondary))] rounded-xl shadow-sm border border-[rgb(var(--color-border))] p-6 transition-colors duration-200">
               <div className="flex items-center justify-between mb-4">
                 <div className={`${stat.bgColor} p-3 rounded-lg`}>
                   <Icon className={`w-6 h-6 ${stat.textColor}`} />
                 </div>
               </div>
               <div>
-                <p className="text-gray-600 text-sm font-medium">{stat.label}</p>
-                <p className="text-3xl font-bold text-gray-900 mt-1">{stat.value}</p>
+                <p className="text-[rgb(var(--color-text-secondary))] text-sm font-medium">{stat.label}</p>
+                <p className="text-3xl font-bold text-[rgb(var(--color-text-primary))] mt-1">{stat.value}</p>
               </div>
             </div>
           );
         })}
       </div>
 
-      <div className="mt-8 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Atividade Recente</h2>
+      <div className="mt-8 bg-[rgb(var(--color-bg-secondary))] rounded-xl shadow-sm border border-[rgb(var(--color-border))] p-6 transition-colors duration-200">
+        <h2 className="text-xl font-semibold text-[rgb(var(--color-text-primary))] mb-4">Atividade Recente</h2>
         <div className="space-y-4">
           {stats.activeAutomations > 0 ? (
-            <p className="text-gray-600">Suas automações estão funcionando perfeitamente!</p>
+            <p className="text-[rgb(var(--color-text-secondary))]">Suas automações estão funcionando perfeitamente!</p>
           ) : (
             <div className="text-center py-8">
               <Zap className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-              <p className="text-gray-600">Nenhuma automação ativa ainda.</p>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-[rgb(var(--color-text-secondary))]">Nenhuma automação ativa ainda.</p>
+              <p className="text-sm text-[rgb(var(--color-text-tertiary))] mt-1">
                 Crie sua primeira automação para começar!
               </p>
             </div>

@@ -42,7 +42,7 @@ export const Sidebar = () => {
   };
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 fixed left-0 top-16 bottom-0 overflow-y-auto">
+    <aside className="w-64 bg-[rgb(var(--color-bg-secondary))] border-r border-[rgb(var(--color-border))] fixed left-0 top-16 bottom-0 overflow-y-auto transition-colors duration-200">
       <nav className="p-4 space-y-1">
         {menuItems.map((item) => {
           const Icon = item.icon;
@@ -60,10 +60,10 @@ export const Sidebar = () => {
                     setExpandedMenu(isExpanded ? null : item.label);
                   }
                 }}
-                className={`flex items-center justify-between px-4 py-3 rounded-lg transition-colors ${
+                className={`flex items-center justify-between px-4 py-3 rounded-lg transition-all duration-200 ${
                   isItemActive
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-700 hover:bg-gray-50'
+                    ? 'bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400'
+                    : 'text-[rgb(var(--color-text-primary))] hover:bg-[rgb(var(--color-bg-tertiary))]'
                 }`}
               >
                 <div className="flex items-center space-x-3">
@@ -87,10 +87,10 @@ export const Sidebar = () => {
                     <Link
                       key={subitem.path}
                       to={subitem.path}
-                      className={`block px-4 py-2 rounded-lg text-sm transition-colors ${
+                      className={`block px-4 py-2 rounded-lg text-sm transition-all duration-200 ${
                         isActive(subitem.path)
-                          ? 'bg-blue-50 text-blue-600 font-medium'
-                          : 'text-gray-600 hover:bg-gray-50'
+                          ? 'bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 font-medium'
+                          : 'text-[rgb(var(--color-text-secondary))] hover:bg-[rgb(var(--color-bg-tertiary))]'
                       }`}
                     >
                       {subitem.label}

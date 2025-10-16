@@ -2,9 +2,12 @@ import { useState } from 'react';
 import { Handle, Position, useReactFlow } from 'reactflow';
 import { GitBranch, Copy, Trash2, Edit2, X, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useNodeTheme } from '../../../hooks/useNodeTheme';
 
 export const ConditionNode = ({ data, id }: any) => {
   const { setNodes, getNodes } = useReactFlow();
+  const { isDark, getNodeClasses } = useNodeTheme();
+  const classes = getNodeClasses('yellow');
   const [isEditing, setIsEditing] = useState(false);
   const [editCondition, setEditCondition] = useState(data.condition || '');
   const [showActions, setShowActions] = useState(false);
@@ -51,13 +54,13 @@ export const ConditionNode = ({ data, id }: any) => {
 
   return (
     <div
-      className="bg-white rounded-lg shadow-lg border-2 border-yellow-500 min-w-[200px] relative group"
+      className={`rounded-lg shadow-lg border-2 min-w-[200px] relative group ${isDark ? 'bg-gray-800 border-yellow-600' : 'bg-white border-yellow-500'}`}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
 
       {showActions && (
-        <div className="absolute -top-10 right-0 flex items-center space-x-1 bg-white rounded-lg shadow-lg border border-gray-200 p-1">
+        <div className={`absolute -top-10 right-0 flex items-center space-x-1 rounded-lg shadow-lg border p-1 ${classes.actionBar}`}>
           <button
             onClick={() => setIsEditing(!isEditing)}
             className="p-1.5 hover:bg-blue-50 rounded transition-colors"
@@ -84,10 +87,10 @@ export const ConditionNode = ({ data, id }: any) => {
 
       <div className="p-4">
         <div className="flex items-center space-x-2 mb-2">
-          <div className="bg-yellow-100 p-2 rounded-lg">
-            <GitBranch className="w-4 h-4 text-yellow-600" />
+          <div className={`p-2 rounded-lg ${isDark ? 'bg-yellow-900/50' : 'bg-yellow-100'}`}>
+            <GitBranch className={`w-4 h-4 ${isDark ? 'text-yellow-400' : 'text-yellow-600'}`} />
           </div>
-          <div className="font-semibold text-gray-900">Condição</div>
+          <div className={`font-semibold ${classes.headerText}`}>Condição</div>
         </div>
 
         {isEditing ? (
@@ -96,7 +99,7 @@ export const ConditionNode = ({ data, id }: any) => {
               type="text"
               value={editCondition}
               onChange={(e) => setEditCondition(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+              className={`w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:border-transparent ${classes.input}`}
               placeholder="Ex: Tag contém 'cliente'"
               autoFocus
             />
@@ -121,7 +124,7 @@ export const ConditionNode = ({ data, id }: any) => {
             </div>
           </div>
         ) : (
-          <div className="text-sm text-gray-600">
+          <div className={`text-sm ${classes.text}`}>
             {data.condition || 'Se... então...'}
           </div>
         )}
@@ -140,7 +143,7 @@ export const ConditionNode = ({ data, id }: any) => {
       <Handle type="target" position={Position.Left} id="target-left" className="w-3 h-3 !bg-red-500" style={{ top: '40%' }} />
       <Handle type="source" position={Position.Left} id="source-left" className="w-3 h-3 !bg-green-500" style={{ top: '60%' }} />
 
-      <div className="flex justify-between text-xs text-gray-500 mt-1 px-4">
+      <div className={`flex justify-between text-xs mt-1 px-4 ${classes.textSecondary}`}>
         <span>Não</span>
         <span>Sim</span>
         <span>Não</span>

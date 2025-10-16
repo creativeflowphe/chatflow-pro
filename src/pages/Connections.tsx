@@ -158,8 +158,8 @@ export const Connections = () => {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Conexões</h1>
-          <p className="text-gray-600 mt-2">Conecte suas contas de redes sociais</p>
+          <h1 className="text-3xl font-bold text-[rgb(var(--color-text-primary))]">Conexões</h1>
+          <p className="text-[rgb(var(--color-text-secondary))] mt-2">Conecte suas contas de redes sociais</p>
         </div>
       </div>
 
@@ -178,14 +178,14 @@ export const Connections = () => {
                 }
               }}
               disabled={!!connected || connecting}
-              className={`bg-white rounded-xl shadow-sm border-2 p-6 text-center hover:shadow-md transition-all ${
+              className={`bg-[rgb(var(--color-bg-secondary))] rounded-xl shadow-sm border-2 p-6 text-center hover:shadow-md transition-all ${
                 connected ? 'border-green-500 cursor-default' : connecting ? 'border-blue-300 opacity-50 cursor-wait' : 'border-gray-200 hover:border-blue-300'
               }`}
             >
               <div className={`${platform.color} w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-3`}>
                 <Icon className="w-8 h-8 text-white" />
               </div>
-              <h3 className="font-semibold text-gray-900 mb-1">{platform.name}</h3>
+              <h3 className="font-semibold text-[rgb(var(--color-text-primary))] mb-1">{platform.name}</h3>
               {connected ? (
                 <span className="inline-block px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
                   Conectado
@@ -210,22 +210,22 @@ export const Connections = () => {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
         </div>
       ) : connections.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+        <div className="bg-[rgb(var(--color-bg-secondary))] rounded-xl shadow-sm border border-[rgb(var(--color-border))] p-12 text-center transition-colors duration-200">
           <Plus className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          <h3 className="text-xl font-semibold text-[rgb(var(--color-text-primary))] mb-2">
             Nenhuma conexão configurada
           </h3>
-          <p className="text-gray-600 mb-4">
+          <p className="text-[rgb(var(--color-text-secondary))] mb-4">
             Conecte suas contas de redes sociais para começar a automatizar
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Minhas Conexões</h2>
+        <div className="bg-[rgb(var(--color-bg-secondary))] rounded-xl shadow-sm border border-[rgb(var(--color-border))] transition-colors duration-200">
+          <div className="p-6 border-b border-[rgb(var(--color-border))]">
+            <h2 className="text-lg font-semibold text-[rgb(var(--color-text-primary))]">Minhas Conexões</h2>
           </div>
 
-          <div className="divide-y divide-gray-200">
+          <div className="divide-y divide-[rgb(var(--color-border))]">
             {connections.map((connection) => {
               const Icon = getPlatformIcon(connection.platform);
               const color = getPlatformColor(connection.platform);
@@ -237,7 +237,7 @@ export const Connections = () => {
                       <Icon className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">
+                      <h3 className="font-semibold text-[rgb(var(--color-text-primary))]">
                         {getPlatformName(connection.platform)}
                       </h3>
                       <p className="text-sm text-gray-600">@{connection.platform_username}</p>

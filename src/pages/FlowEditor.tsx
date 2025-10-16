@@ -15,6 +15,7 @@ import 'reactflow/dist/style.css';
 import { ArrowLeft, Play, Save, Power, PowerOff } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { TriggerNode } from '../components/flow/nodes/TriggerNode';
 import { MessageNode } from '../components/flow/nodes/MessageNode';
 import { ConditionNode } from '../components/flow/nodes/ConditionNode';
@@ -39,6 +40,7 @@ export const FlowEditor = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isDark } = useTheme();
   const [automation, setAutomation] = useState<any>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -213,30 +215,30 @@ export const FlowEditor = () => {
 
   if (!automation) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className={`flex items-center justify-center h-screen ${isDark ? 'bg-gray-900' : 'bg-white'}`}>
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 bg-white flex flex-col">
-      <div className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
+    <div className={`fixed inset-0 flex flex-col ${isDark ? 'bg-gray-900' : 'bg-white'}`}>
+      <div className={`h-16 border-b flex items-center justify-between px-6 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
         <div className="flex items-center space-x-4">
           <button
             onClick={() => navigate('/automations')}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className={`p-2 rounded-lg transition-colors ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
           >
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
+            <ArrowLeft className={`w-5 h-5 ${isDark ? 'text-gray-300' : 'text-gray-600'}`} />
           </button>
           <div>
-            <h1 className="text-lg font-semibold text-gray-900">{automation.name}</h1>
-            <p className="text-sm text-gray-500">{automation.description}</p>
+            <h1 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{automation.name}</h1>
+            <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{automation.description}</p>
           </div>
         </div>
 
         <div className="flex items-center space-x-3">
-          <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+          <button className={`flex items-center space-x-2 px-4 py-2 border rounded-lg transition-colors ${isDark ? 'border-gray-600 hover:bg-gray-700 text-gray-200' : 'border-gray-300 hover:bg-gray-50 text-gray-900'}`}>
             <Play className="w-4 h-4" />
             <span>Testar</span>
           </button>
@@ -283,14 +285,15 @@ export const FlowEditor = () => {
             onConnect={onConnect}
             nodeTypes={nodeTypes}
             fitView
+            className={isDark ? 'dark-flow' : ''}
           >
-            <Controls />
-            <MiniMap />
-            <Background gap={12} size={1} />
+            <Controls className={isDark ? 'dark-controls' : ''} />
+            <MiniMap className={isDark ? 'dark-minimap' : ''} nodeColor={isDark ? '#374151' : undefined} maskColor={isDark ? 'rgba(0, 0, 0, 0.7)' : undefined} />
+            <Background gap={12} size={1} color={isDark ? '#4B5563' : undefined} />
           </ReactFlow>
         </div>
 
-        <NodePalette onDragStart={onDragStart} />
+        <NodePalette onDragStart={onDragStart} isDark={isDark} />
       </div>
 
     </div>

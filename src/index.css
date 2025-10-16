@@ -1,3 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --color-bg-primary: 249 250 251;
+    --color-bg-secondary: 255 255 255;
+    --color-bg-tertiary: 243 244 246;
+    --color-text-primary: 17 24 39;
+    --color-text-secondary: 75 85 99;
+    --color-text-tertiary: 156 163 175;
+    --color-border: 229 231 235;
+    --color-accent: 37 99 235;
+    --color-accent-hover: 29 78 216;
+  }
+
+  .dark {
+    --color-bg-primary: 17 24 39;
+    --color-bg-secondary: 31 41 55;
+    --color-bg-tertiary: 55 65 81;
+    --color-text-primary: 243 244 246;
+    --color-text-secondary: 209 213 219;
+    --color-text-tertiary: 156 163 175;
+    --color-border: 55 65 81;
+    --color-accent: 59 130 246;
+    --color-accent-hover: 37 99 235;
+  }
+
+  body {
+    @apply bg-[rgb(var(--color-bg-primary))] text-[rgb(var(--color-text-primary))] transition-colors duration-200;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  }
+}
+
+.dark .react-flow__background {
+  background-color: #111827;
+}
+
+.dark .react-flow__edge-path {
+  stroke: #6B7280;
+}
+
+.dark .react-flow__controls {
+  background-color: #1F2937;
+  border: 1px solid #374151;
+}
+
+.dark .react-flow__controls button {
+  background-color: #374151;
+  border-bottom: 1px solid #4B5563;
+  color: #D1D5DB;
+}
+
+.dark .react-flow__controls button:hover {
+  background-color: #4B5563;
+}
+
+.dark .react-flow__minimap {
+  background-color: #1F2937;
+  border: 1px solid #374151;
+}

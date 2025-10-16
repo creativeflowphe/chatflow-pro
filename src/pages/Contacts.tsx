@@ -54,15 +54,15 @@ export const Contacts = () => {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Contatos</h1>
-          <p className="text-gray-600 mt-2">Gerencie sua lista de contatos</p>
+          <h1 className="text-3xl font-bold text-[rgb(var(--color-text-primary))]">Contatos</h1>
+          <p className="text-[rgb(var(--color-text-secondary))] mt-2">Gerencie sua lista de contatos</p>
         </div>
         <div className="flex space-x-3">
-          <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+          <button className="flex items-center space-x-2 px-4 py-2 border border-[rgb(var(--color-border))] rounded-lg hover:bg-[rgb(var(--color-bg-tertiary))] transition-colors text-[rgb(var(--color-text-primary))]">
             <Download className="w-4 h-4" />
             <span>Exportar</span>
           </button>
-          <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+          <button className="flex items-center space-x-2 px-4 py-2 border border-[rgb(var(--color-border))] rounded-lg hover:bg-[rgb(var(--color-bg-tertiary))] transition-colors text-[rgb(var(--color-text-primary))]">
             <Upload className="w-4 h-4" />
             <span>Importar CSV</span>
           </button>
@@ -76,42 +76,42 @@ export const Contacts = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-        <div className="p-4 border-b border-gray-200">
+      <div className="bg-[rgb(var(--color-bg-secondary))] rounded-xl shadow-sm border border-[rgb(var(--color-border))] transition-colors duration-200">
+        <div className="p-4 border-b border-[rgb(var(--color-border))]">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[rgb(var(--color-text-tertiary))]" />
             <input
               type="text"
               placeholder="Buscar contatos..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 bg-[rgb(var(--color-bg-primary))] border border-[rgb(var(--color-border))] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-[rgb(var(--color-text-primary))] placeholder-[rgb(var(--color-text-tertiary))]"
             />
           </div>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-[rgb(var(--color-bg-tertiary))] border-b border-[rgb(var(--color-border))]">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--color-text-secondary))] uppercase tracking-wider">
                   Nome
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--color-text-secondary))] uppercase tracking-wider">
                   ID da Plataforma
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--color-text-secondary))] uppercase tracking-wider">
                   Tags
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--color-text-secondary))] uppercase tracking-wider">
                   Última Interação
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--color-text-secondary))] uppercase tracking-wider">
                   Criado em
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-[rgb(var(--color-bg-secondary))] divide-y divide-[rgb(var(--color-border))]">
               {loading ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center">
@@ -124,9 +124,9 @@ export const Contacts = () => {
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center">
                     <div>
-                      <Tag className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                      <p className="text-gray-600">Nenhum contato encontrado</p>
-                      <p className="text-sm text-gray-500 mt-1">
+                      <Tag className="w-12 h-12 text-[rgb(var(--color-text-tertiary))] mx-auto mb-3" />
+                      <p className="text-[rgb(var(--color-text-secondary))]">Nenhum contato encontrado</p>
+                      <p className="text-sm text-[rgb(var(--color-text-tertiary))] mt-1">
                         {searchTerm ? 'Tente uma busca diferente' : 'Adicione seu primeiro contato'}
                       </p>
                     </div>
@@ -134,20 +134,20 @@ export const Contacts = () => {
                 </tr>
               ) : (
                 filteredContacts.map((contact) => (
-                  <tr key={contact.id} className="hover:bg-gray-50">
+                  <tr key={contact.id} className="hover:bg-[rgb(var(--color-bg-tertiary))] transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                          <span className="text-blue-600 font-semibold">
+                        <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                          <span className="text-blue-600 dark:text-blue-400 font-semibold">
                             {contact.name.charAt(0).toUpperCase()}
                           </span>
                         </div>
                         <div className="ml-3">
-                          <div className="text-sm font-medium text-gray-900">{contact.name}</div>
+                          <div className="text-sm font-medium text-[rgb(var(--color-text-primary))]">{contact.name}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[rgb(var(--color-text-secondary))]">
                       {contact.platform_id}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -156,20 +156,20 @@ export const Contacts = () => {
                           contact.tags.map((tag, idx) => (
                             <span
                               key={idx}
-                              className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                              className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
                             >
                               {tag}
                             </span>
                           ))
                         ) : (
-                          <span className="text-sm text-gray-400">Sem tags</span>
+                          <span className="text-sm text-[rgb(var(--color-text-tertiary))]">Sem tags</span>
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[rgb(var(--color-text-secondary))]">
                       {formatDate(contact.last_interaction)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[rgb(var(--color-text-secondary))]">
                       {formatDate(contact.created_at)}
                     </td>
                   </tr>

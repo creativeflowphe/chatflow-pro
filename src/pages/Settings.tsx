@@ -52,39 +52,39 @@ export const Settings = () => {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Configurações</h1>
-        <p className="text-gray-600 mt-2">Gerencie suas preferências e conta</p>
+        <h1 className="text-3xl font-bold text-[rgb(var(--color-text-primary))]">Configurações</h1>
+        <p className="text-[rgb(var(--color-text-secondary))] mt-2">Gerencie suas preferências e conta</p>
       </div>
 
       <div className="space-y-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
+        <div className="bg-[rgb(var(--color-bg-secondary))] rounded-xl shadow-sm border border-[rgb(var(--color-border))] transition-colors duration-200">
+          <div className="p-6 border-b border-[rgb(var(--color-border))]">
             <div className="flex items-center space-x-2">
-              <User className="w-5 h-5 text-gray-600" />
-              <h2 className="text-lg font-semibold text-gray-900">Perfil</h2>
+              <User className="w-5 h-5 text-[rgb(var(--color-text-secondary))]" />
+              <h2 className="text-lg font-semibold text-[rgb(var(--color-text-primary))]">Perfil</h2>
             </div>
           </div>
 
           <div className="p-6 space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <label className="block text-sm font-medium text-[rgb(var(--color-text-secondary))] mb-1">Email</label>
               <input
                 type="email"
                 value={user?.email || ''}
                 disabled
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
+                className="w-full px-4 py-2 border border-[rgb(var(--color-border))] rounded-lg bg-[rgb(var(--color-bg-tertiary))] text-[rgb(var(--color-text-tertiary))]"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-[rgb(var(--color-text-secondary))] mb-1">
                 Nome Completo
               </label>
               <input
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-[rgb(var(--color-border))] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[rgb(var(--color-bg-primary))] text-[rgb(var(--color-text-primary))]"
               />
             </div>
 
@@ -98,21 +98,21 @@ export const Settings = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
+        <div className="bg-[rgb(var(--color-bg-secondary))] rounded-xl shadow-sm border border-[rgb(var(--color-border))] transition-colors duration-200">
+          <div className="p-6 border-b border-[rgb(var(--color-border))]">
             <div className="flex items-center space-x-2">
-              <CreditCard className="w-5 h-5 text-gray-600" />
-              <h2 className="text-lg font-semibold text-gray-900">Plano e Pagamento</h2>
+              <CreditCard className="w-5 h-5 text-[rgb(var(--color-text-secondary))]" />
+              <h2 className="text-lg font-semibold text-[rgb(var(--color-text-primary))]">Plano e Pagamento</h2>
             </div>
           </div>
 
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="font-semibold text-gray-900">
+                <h3 className="font-semibold text-[rgb(var(--color-text-primary))]">
                   Plano Atual: {profile?.plan === 'pro' ? 'Pro' : 'Free'}
                 </h3>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm text-[rgb(var(--color-text-secondary))] mt-1">
                   {profile?.plan === 'pro'
                     ? 'Você tem acesso a todos os recursos premium'
                     : 'Atualize para Pro e tenha acesso ilimitado'}
@@ -121,8 +121,8 @@ export const Settings = () => {
               <span
                 className={`px-4 py-2 rounded-lg font-medium ${
                   profile?.plan === 'pro'
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'bg-gray-100 text-gray-700'
+                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                    : 'bg-[rgb(var(--color-bg-tertiary))] text-[rgb(var(--color-text-secondary))]'
                 }`}
               >
                 {profile?.plan === 'pro' ? 'PRO' : 'FREE'}
@@ -137,18 +137,18 @@ export const Settings = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
+        <div className="bg-[rgb(var(--color-bg-secondary))] rounded-xl shadow-sm border border-[rgb(var(--color-border))] transition-colors duration-200">
+          <div className="p-6 border-b border-[rgb(var(--color-border))]">
             <div className="flex items-center space-x-2">
-              <Globe className="w-5 h-5 text-gray-600" />
-              <h2 className="text-lg font-semibold text-gray-900">Idioma</h2>
+              <Globe className="w-5 h-5 text-[rgb(var(--color-text-secondary))]" />
+              <h2 className="text-lg font-semibold text-[rgb(var(--color-text-primary))]">Idioma</h2>
             </div>
           </div>
 
           <div className="p-6">
             <select
               defaultValue="pt-BR"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-[rgb(var(--color-border))] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[rgb(var(--color-bg-primary))] text-[rgb(var(--color-text-primary))]"
             >
               <option value="pt-BR">Português (Brasil)</option>
               <option value="en">English</option>

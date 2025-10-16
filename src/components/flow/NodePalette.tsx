@@ -2,9 +2,10 @@ import { Zap, MessageSquare, GitBranch, Tag, Send, Link, Radio } from 'lucide-re
 
 interface NodePaletteProps {
   onDragStart: (event: React.DragEvent, nodeType: string) => void;
+  isDark: boolean;
 }
 
-export const NodePalette = ({ onDragStart }: NodePaletteProps) => {
+export const NodePalette = ({ onDragStart, isDark }: NodePaletteProps) => {
   const nodeTypes = [
     {
       category: 'Gatilhos',
@@ -36,6 +37,15 @@ export const NodePalette = ({ onDragStart }: NodePaletteProps) => {
   ];
 
   const getColorClasses = (color: string) => {
+    if (isDark) {
+      const darkColors: Record<string, { bg: string; text: string; border: string }> = {
+        blue: { bg: 'bg-blue-900/30', text: 'text-blue-300', border: 'border-blue-600' },
+        green: { bg: 'bg-green-900/30', text: 'text-green-300', border: 'border-green-600' },
+        yellow: { bg: 'bg-yellow-900/30', text: 'text-yellow-300', border: 'border-yellow-600' },
+        purple: { bg: 'bg-purple-900/30', text: 'text-purple-300', border: 'border-purple-600' },
+      };
+      return darkColors[color] || darkColors.blue;
+    }
     const colors: Record<string, { bg: string; text: string; border: string }> = {
       blue: { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-300' },
       green: { bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-300' },
@@ -46,13 +56,13 @@ export const NodePalette = ({ onDragStart }: NodePaletteProps) => {
   };
 
   return (
-    <div className="w-64 bg-white border-l border-gray-200 p-4 overflow-y-auto">
-      <h3 className="text-sm font-semibold text-gray-900 mb-4">Paleta de Nós</h3>
+    <div className={`w-64 border-l p-4 overflow-y-auto ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+      <h3 className={`text-sm font-semibold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>Paleta de Nós</h3>
 
       <div className="space-y-4">
         {nodeTypes.map((category) => (
           <div key={category.category}>
-            <h4 className="text-xs font-medium text-gray-500 uppercase mb-2">
+            <h4 className={`text-xs font-medium uppercase mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
               {category.category}
             </h4>
             <div className="space-y-2">
@@ -80,8 +90,8 @@ export const NodePalette = ({ onDragStart }: NodePaletteProps) => {
         ))}
       </div>
 
-      <div className="mt-6 p-3 bg-gray-50 rounded-lg">
-        <p className="text-xs text-gray-600">
+      <div className={`mt-6 p-3 rounded-lg ${isDark ? 'bg-gray-700/50' : 'bg-gray-50'}`}>
+        <p className={`text-xs ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
           Arraste os nós para o canvas para criar seu fluxo de automação.
         </p>
       </div>

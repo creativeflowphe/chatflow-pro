@@ -144,10 +144,10 @@ export const Chat = () => {
   };
 
   return (
-    <div className="fixed inset-0 ml-64 mt-16 flex bg-white">
-      <div className="w-80 border-r border-gray-200 flex flex-col">
-        <div className="p-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900 mb-3">Chat ao Vivo</h2>
+    <div className="fixed inset-0 ml-64 mt-16 flex bg-[rgb(var(--color-bg-primary))] transition-colors duration-200">
+      <div className="w-80 border-r border-[rgb(var(--color-border))] flex flex-col bg-[rgb(var(--color-bg-secondary))]">
+        <div className="p-4 border-b border-[rgb(var(--color-border))]">
+          <h2 className="text-xl font-semibold text-[rgb(var(--color-text-primary))] mb-3">Chat ao Vivo</h2>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
@@ -155,7 +155,7 @@ export const Chat = () => {
               placeholder="Buscar conversas..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-9 pr-3 py-2 border border-[rgb(var(--color-border))] rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[rgb(var(--color-bg-primary))] text-[rgb(var(--color-text-primary))]"
             />
           </div>
         </div>
@@ -171,7 +171,7 @@ export const Chat = () => {
               <p className="text-gray-600">Nenhum contato</p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-200">
+            <div className="divide-y divide-[rgb(var(--color-border))]">
               {filteredContacts.map((contact) => (
                 <button
                   key={contact.id}
@@ -219,13 +219,13 @@ export const Chat = () => {
       <div className="flex-1 flex flex-col">
         {selectedContactData ? (
           <>
-            <div className="h-16 border-b border-gray-200 flex items-center justify-between px-6">
+            <div className="h-16 border-b border-[rgb(var(--color-border))] flex items-center justify-between px-6 bg-[rgb(var(--color-bg-secondary))]">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                   <User className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
-                  <div className="font-semibold text-gray-900">
+                  <div className="font-semibold text-[rgb(var(--color-text-primary))]">
                     {selectedContactData.full_name || selectedContactData.username || 'Sem nome'}
                   </div>
                   <div className="text-sm text-gray-500">
@@ -287,7 +287,7 @@ export const Chat = () => {
               ))}
             </div>
 
-            <div className="border-t border-gray-200 p-4">
+            <div className="border-t border-[rgb(var(--color-border))] p-4 bg-[rgb(var(--color-bg-secondary))]">
               <div className="flex items-center space-x-2">
                 <input
                   type="text"
@@ -295,7 +295,7 @@ export const Chat = () => {
                   onChange={(e) => setMessageInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
                   placeholder="Digite sua mensagem..."
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="flex-1 px-4 py-2 border border-[rgb(var(--color-border))] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[rgb(var(--color-bg-primary))] text-[rgb(var(--color-text-primary))]"
                 />
                 <button
                   onClick={sendMessage}

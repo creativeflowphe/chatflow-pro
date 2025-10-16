@@ -2,9 +2,12 @@ import { useState } from 'react';
 import { Handle, Position, useReactFlow } from 'reactflow';
 import { MessageSquare, Copy, Trash2, Edit2, X, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useNodeTheme } from '../../../hooks/useNodeTheme';
 
 export const MessageNode = ({ data, id }: any) => {
   const { setNodes, getNodes } = useReactFlow();
+  const { isDark, getNodeClasses } = useNodeTheme();
+  const classes = getNodeClasses('green');
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(data.content || '');
   const [showActions, setShowActions] = useState(false);
@@ -51,13 +54,13 @@ export const MessageNode = ({ data, id }: any) => {
 
   return (
     <div
-      className="bg-white rounded-lg shadow-lg border-2 border-green-500 min-w-[250px] relative group"
+      className={`rounded-lg shadow-lg border-2 min-w-[250px] relative group ${isDark ? 'bg-gray-800 border-green-600' : 'bg-white border-green-500'}`}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
 
       {showActions && (
-        <div className="absolute -top-10 right-0 flex items-center space-x-1 bg-white rounded-lg shadow-lg border border-gray-200 p-1">
+        <div className={`absolute -top-10 right-0 flex items-center space-x-1 rounded-lg shadow-lg border p-1 ${classes.actionBar}`}>
           <button
             onClick={() => setIsEditing(!isEditing)}
             className="p-1.5 hover:bg-blue-50 rounded transition-colors"
@@ -84,10 +87,10 @@ export const MessageNode = ({ data, id }: any) => {
 
       <div className="p-4">
         <div className="flex items-center space-x-2 mb-2">
-          <div className="bg-green-100 p-2 rounded-lg">
-            <MessageSquare className="w-4 h-4 text-green-600" />
+          <div className={`p-2 rounded-lg ${isDark ? 'bg-green-900/50' : 'bg-green-100'}`}>
+            <MessageSquare className={`w-4 h-4 ${isDark ? 'text-green-400' : 'text-green-600'}`} />
           </div>
-          <div className="font-semibold text-gray-900">Mensagem</div>
+          <div className={`font-semibold ${classes.headerText}`}>Mensagem</div>
         </div>
 
         {isEditing ? (
@@ -95,7 +98,7 @@ export const MessageNode = ({ data, id }: any) => {
             <textarea
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+              className={`w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:border-transparent resize-none ${classes.input}`}
               rows={3}
               placeholder="Digite sua mensagem..."
               autoFocus
@@ -121,7 +124,7 @@ export const MessageNode = ({ data, id }: any) => {
             </div>
           </div>
         ) : (
-          <div className="text-sm text-gray-600 mb-2">
+          <div className={`text-sm mb-2 ${classes.text}`}>
             {data.content || 'Digite sua mensagem...'}
           </div>
         )}
@@ -129,14 +132,14 @@ export const MessageNode = ({ data, id }: any) => {
         {data.buttons && data.buttons.length > 0 && (
           <div className="space-y-1 mt-2">
             {data.buttons.map((btn: string, idx: number) => (
-              <div key={idx} className="bg-blue-50 px-3 py-1 rounded text-xs text-blue-700">
+              <div key={idx} className={`px-3 py-1 rounded text-xs ${isDark ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-50 text-blue-700'}`}>
                 {btn}
               </div>
             ))}
           </div>
         )}
         {data.delay && (
-          <div className="mt-2 text-xs text-gray-500">
+          <div className={`mt-2 text-xs ${classes.textSecondary}`}>
             Aguardar: {data.delay}
           </div>
         )}

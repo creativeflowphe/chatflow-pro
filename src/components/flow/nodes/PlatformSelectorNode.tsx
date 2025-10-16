@@ -4,6 +4,7 @@ import { Network, Instagram, MessageCircle, Facebook, Twitter, Check } from 'luc
 import toast from 'react-hot-toast';
 import { supabase } from '../../../lib/supabase';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useNodeTheme } from '../../../hooks/useNodeTheme';
 
 interface Platform {
   id: string;
@@ -15,6 +16,7 @@ interface Platform {
 export const PlatformSelectorNode = ({ data, id }: any) => {
   const { setNodes } = useReactFlow();
   const { user } = useAuth();
+  const { isDark } = useNodeTheme();
   const [platforms, setPlatforms] = useState<Platform[]>([]);
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(data.selectedPlatforms || []);
   const [loading, setLoading] = useState(true);
@@ -95,8 +97,8 @@ export const PlatformSelectorNode = ({ data, id }: any) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-xl border-2 border-blue-600 min-w-[320px]">
-      <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4 rounded-t-lg">
+    <div className={`rounded-lg shadow-xl border-2 border-blue-600 min-w-[320px] ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
+      <div className={`p-4 rounded-t-lg ${isDark ? 'bg-gradient-to-r from-blue-600 to-blue-700' : 'bg-gradient-to-r from-blue-500 to-blue-600'}`}>
         <div className="flex items-center space-x-3 text-white">
           <div className="bg-white/20 p-2 rounded-lg">
             <Network className="w-6 h-6" />
@@ -115,9 +117,9 @@ export const PlatformSelectorNode = ({ data, id }: any) => {
           </div>
         ) : platforms.length === 0 ? (
           <div className="text-center py-8">
-            <Network className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-sm text-gray-600 mb-2">Nenhuma conexão ativa encontrada</p>
-            <p className="text-xs text-gray-500">Conecte suas redes sociais primeiro</p>
+            <Network className={`w-12 h-12 mx-auto mb-3 ${isDark ? 'text-gray-600' : 'text-gray-300'}`} />
+            <p className={`text-sm mb-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Nenhuma conexão ativa encontrada</p>
+            <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Conecte suas redes sociais primeiro</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -129,8 +131,8 @@ export const PlatformSelectorNode = ({ data, id }: any) => {
                   onClick={() => togglePlatform(platform.id)}
                   className={`w-full flex items-center justify-between p-3 rounded-lg border-2 transition-all ${
                     isSelected
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300 bg-white'
+                      ? isDark ? 'border-blue-500 bg-blue-900/30' : 'border-blue-500 bg-blue-50'
+                      : isDark ? 'border-gray-600 hover:border-gray-500 bg-gray-700/50' : 'border-gray-200 hover:border-gray-300 bg-white'
                   }`}
                 >
                   <div className="flex items-center space-x-3">
@@ -142,10 +144,10 @@ export const PlatformSelectorNode = ({ data, id }: any) => {
                       {getPlatformIcon(platform.platform)}
                     </div>
                     <div className="text-left">
-                      <div className="font-semibold text-gray-900 text-sm capitalize">
+                      <div className={`font-semibold text-sm capitalize ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
                         {platform.platform}
                       </div>
-                      <div className="text-xs text-gray-500">@{platform.platform_username}</div>
+                      <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>@{platform.platform_username}</div>
                     </div>
                   </div>
                   {isSelected && (
@@ -160,8 +162,8 @@ export const PlatformSelectorNode = ({ data, id }: any) => {
         )}
 
         {selectedPlatforms.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-gray-200">
-            <div className="text-xs text-gray-600 mb-2">
+          <div className={`mt-4 pt-4 border-t ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+            <div className={`text-xs mb-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
               {selectedPlatforms.length} plataforma(s) selecionada(s)
             </div>
             <div className="flex flex-wrap gap-1">
@@ -170,7 +172,7 @@ export const PlatformSelectorNode = ({ data, id }: any) => {
                 .map((p) => (
                   <span
                     key={p.id}
-                    className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                    className={`inline-flex items-center px-2 py-1 text-xs rounded-full ${isDark ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-100 text-blue-800'}`}
                   >
                     {p.platform}
                   </span>

@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { Handle, Position, useReactFlow } from 'reactflow';
 import { Radio, Copy, Trash2, Edit2, X, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useNodeTheme } from '../../../hooks/useNodeTheme';
 
 export const BroadcastNode = ({ data, id }: any) => {
   const { setNodes, getNodes } = useReactFlow();
+  const { isDark } = useNodeTheme();
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(data.content || '');
   const [showActions, setShowActions] = useState(false);
@@ -51,13 +53,19 @@ export const BroadcastNode = ({ data, id }: any) => {
 
   return (
     <div
-      className="bg-purple-50 border-2 border-purple-400 rounded-lg shadow-md min-w-[200px] relative group"
+      className={`border-2 rounded-lg shadow-md min-w-[200px] relative group ${
+        isDark
+          ? 'bg-purple-900/20 border-purple-600'
+          : 'bg-purple-50 border-purple-400'
+      }`}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
 
       {showActions && (
-        <div className="absolute -top-10 right-0 flex items-center space-x-1 bg-white rounded-lg shadow-lg border border-gray-200 p-1">
+        <div className={`absolute -top-10 right-0 flex items-center space-x-1 rounded-lg shadow-lg border p-1 ${
+          isDark ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-200'
+        }`}>
           <button
             onClick={() => setIsEditing(!isEditing)}
             className="p-1.5 hover:bg-blue-50 rounded transition-colors"
@@ -87,19 +95,29 @@ export const BroadcastNode = ({ data, id }: any) => {
           <div className="p-1.5 bg-purple-500 rounded">
             <Radio className="w-4 h-4 text-white" />
           </div>
-          <span className="text-sm font-semibold text-purple-900">Broadcast</span>
+          <span className={`text-sm font-semibold ${
+            isDark ? 'text-purple-300' : 'text-purple-900'
+          }`}>Broadcast</span>
         </div>
 
-        <div className="text-xs text-purple-700 space-y-1">
+        <div className={`text-xs space-y-1 ${
+          isDark ? 'text-purple-300' : 'text-purple-700'
+        }`}>
           <p className="font-medium">{data.label || 'Enviar Broadcast'}</p>
           {data.tags && data.tags.length > 0 && (
             <div className="mt-2">
-              <p className="text-purple-600 mb-1">Para tags:</p>
+              <p className={`mb-1 ${
+                isDark ? 'text-purple-400' : 'text-purple-600'
+              }`}>Para tags:</p>
               <div className="flex flex-wrap gap-1">
                 {data.tags.map((tag: string, idx: number) => (
                   <span
                     key={idx}
-                    className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-200 text-purple-800"
+                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                      isDark
+                        ? 'bg-purple-900/50 text-purple-300'
+                        : 'bg-purple-200 text-purple-800'
+                    }`}
                   >
                     {tag}
                   </span>
@@ -113,7 +131,11 @@ export const BroadcastNode = ({ data, id }: any) => {
               <textarea
                 value={editContent}
                 onChange={(e) => setEditContent(e.target.value)}
-                className="w-full px-3 py-2 border border-purple-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none bg-white"
+                className={`w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none ${
+                  isDark
+                    ? 'bg-gray-700 border-gray-600 text-gray-100'
+                    : 'bg-white border-purple-300 text-gray-900'
+                }`}
                 rows={3}
                 placeholder="Mensagem do broadcast..."
                 autoFocus
@@ -140,7 +162,9 @@ export const BroadcastNode = ({ data, id }: any) => {
             </div>
           ) : (
             data.content && (
-              <p className="mt-2 text-purple-600 line-clamp-2">{data.content}</p>
+              <p className={`mt-2 line-clamp-2 ${
+                isDark ? 'text-purple-400' : 'text-purple-600'
+              }`}>{data.content}</p>
             )
           )}
         </div>

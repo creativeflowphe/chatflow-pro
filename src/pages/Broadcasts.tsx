@@ -94,8 +94,8 @@ export const Broadcasts = () => {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Disparo de Mensagens</h1>
-          <p className="text-gray-600 mt-2">Envie mensagens em massa para seus contatos</p>
+          <h1 className="text-3xl font-bold text-[rgb(var(--color-text-primary))]">Disparo de Mensagens</h1>
+          <p className="text-[rgb(var(--color-text-secondary))] mt-2">Envie mensagens em massa para seus contatos</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
@@ -111,12 +111,12 @@ export const Broadcasts = () => {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
         </div>
       ) : broadcasts.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+        <div className="bg-[rgb(var(--color-bg-secondary))] rounded-xl shadow-sm border border-[rgb(var(--color-border))] p-12 text-center transition-colors duration-200">
           <Send className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          <h3 className="text-xl font-semibold text-[rgb(var(--color-text-primary))] mb-2">
             Nenhum disparo criado ainda
           </h3>
-          <p className="text-gray-600 mb-4">
+          <p className="text-[rgb(var(--color-text-secondary))] mb-4">
             Crie seu primeiro disparo para enviar mensagens para seus contatos
           </p>
         </div>
@@ -125,11 +125,11 @@ export const Broadcasts = () => {
           {broadcasts.map((broadcast) => (
             <div
               key={broadcast.id}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+              className="bg-[rgb(var(--color-bg-secondary))] rounded-xl shadow-sm border border-[rgb(var(--color-border))] p-6 hover:shadow-md transition-all duration-200"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                  <h3 className="text-lg font-semibold text-[rgb(var(--color-text-primary))] mb-1">
                     {broadcast.name}
                   </h3>
                   <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(broadcast.status)}`}>
@@ -183,9 +183,9 @@ export const Broadcasts = () => {
 
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">Novo Disparo de Mensagens</h2>
+          <div className="bg-[rgb(var(--color-bg-secondary))] rounded-xl shadow-xl max-w-2xl w-full">
+            <div className="p-6 border-b border-[rgb(var(--color-border))]">
+              <h2 className="text-xl font-semibold text-[rgb(var(--color-text-primary))]">Novo Disparo de Mensagens</h2>
             </div>
 
             <div className="p-6 space-y-4">
@@ -198,7 +198,7 @@ export const Broadcasts = () => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Ex: Promoção de Verão"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-[rgb(var(--color-border))] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[rgb(var(--color-bg-primary))] text-[rgb(var(--color-text-primary))]"
                 />
               </div>
 
@@ -211,7 +211,7 @@ export const Broadcasts = () => {
                   onChange={(e) => setContent(e.target.value)}
                   placeholder="Digite a mensagem que será enviada..."
                   rows={5}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  className="w-full px-4 py-2 border border-[rgb(var(--color-border))] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-[rgb(var(--color-bg-primary))] text-[rgb(var(--color-text-primary))]"
                 />
                 <p className="text-sm text-gray-500 mt-1">
                   {content.length} caracteres
@@ -227,7 +227,7 @@ export const Broadcasts = () => {
                   value={tags}
                   onChange={(e) => setTags(e.target.value)}
                   placeholder="Ex: cliente-vip, interessado"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-[rgb(var(--color-border))] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[rgb(var(--color-bg-primary))] text-[rgb(var(--color-text-primary))]"
                 />
                 <p className="text-sm text-gray-500 mt-1">
                   Deixe em branco para enviar para todos os contatos
@@ -235,10 +235,10 @@ export const Broadcasts = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-end space-x-3 p-6 border-t border-gray-200">
+            <div className="flex items-center justify-end space-x-3 p-6 border-t border-[rgb(var(--color-border))]">
               <button
                 onClick={() => setShowModal(false)}
-                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               >
                 Cancelar
               </button>

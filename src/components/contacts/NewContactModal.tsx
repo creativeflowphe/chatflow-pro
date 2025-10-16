@@ -122,20 +122,20 @@ export const NewContactModal = ({ isOpen, onClose, onSuccess }: NewContactModalP
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">Novo Contato</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Novo Contato</h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Nome <span className="text-red-500">*</span>
             </label>
             <input
@@ -143,7 +143,7 @@ export const NewContactModal = ({ isOpen, onClose, onSuccess }: NewContactModalP
               value={name}
               onChange={(e) => setName(e.target.value)}
               disabled={loading}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
               placeholder="Ex: João Silva"
               required
             />
@@ -151,14 +151,14 @@ export const NewContactModal = ({ isOpen, onClose, onSuccess }: NewContactModalP
 
           {connections.length > 0 && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Conexão / Plataforma <span className="text-red-500">*</span>
               </label>
               <select
                 value={connectionId}
                 onChange={(e) => handleConnectionChange(e.target.value)}
                 disabled={loading}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
                 required
               >
                 <option value="">Selecione uma conexão</option>
@@ -172,15 +172,15 @@ export const NewContactModal = ({ isOpen, onClose, onSuccess }: NewContactModalP
           )}
 
           {connections.length === 0 && (
-            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <p className="text-sm text-yellow-800">
+            <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+              <p className="text-sm text-yellow-800 dark:text-yellow-300">
                 Nenhuma conexão ativa encontrada. Configure uma conexão primeiro na página de Conexões.
               </p>
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               ID da Plataforma <span className="text-red-500">*</span>
             </label>
             <input
@@ -188,17 +188,17 @@ export const NewContactModal = ({ isOpen, onClose, onSuccess }: NewContactModalP
               value={platformUserId}
               onChange={(e) => setPlatformUserId(e.target.value)}
               disabled={loading}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
               placeholder="Ex: @joao_silva ou 123456789"
               required
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               Username ou ID único do contato na plataforma
             </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Tags
             </label>
             <div className="flex space-x-2">
@@ -213,14 +213,14 @@ export const NewContactModal = ({ isOpen, onClose, onSuccess }: NewContactModalP
                   }
                 }}
                 disabled={loading}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
                 placeholder="Digite uma tag e pressione Enter"
               />
               <button
                 type="button"
                 onClick={handleAddTag}
                 disabled={loading}
-                className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors disabled:opacity-50"
+                className="px-3 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors disabled:opacity-50"
               >
                 <Tag className="w-5 h-5" />
               </button>
@@ -252,7 +252,7 @@ export const NewContactModal = ({ isOpen, onClose, onSuccess }: NewContactModalP
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
             >
               Cancelar
             </button>

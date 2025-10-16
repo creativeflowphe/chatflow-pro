@@ -170,13 +170,13 @@ export const Automations = () => {
       <div className="mb-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{getPageTitle()}</h1>
-            <p className="text-gray-600 mt-2">{getPageDescription()}</p>
+            <h1 className="text-3xl font-bold text-[rgb(var(--color-text-primary))]">{getPageTitle()}</h1>
+            <p className="text-[rgb(var(--color-text-secondary))] mt-2">{getPageDescription()}</p>
           </div>
           <div className="flex items-center space-x-3">
             <button
               onClick={() => setShowTemplatesModal(true)}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-2"
+              className="px-4 py-2 border border-[rgb(var(--color-border))] rounded-lg hover:bg-[rgb(var(--color-bg-tertiary))] transition-colors flex items-center space-x-2 text-[rgb(var(--color-text-primary))]"
             >
               <Zap className="w-5 h-5" />
               <span>Templates</span>
@@ -191,11 +191,11 @@ export const Automations = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <div className="bg-[rgb(var(--color-bg-secondary))] rounded-xl shadow-sm border border-[rgb(var(--color-border))] p-4 transition-colors duration-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total de Automações</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">{stats.total}</p>
+                <p className="text-sm text-[rgb(var(--color-text-secondary))]">Total de Automações</p>
+                <p className="text-2xl font-bold text-[rgb(var(--color-text-primary))] mt-1">{stats.total}</p>
               </div>
               <div className="p-3 bg-blue-100 rounded-lg">
                 <Zap className="w-6 h-6 text-blue-600" />
@@ -203,10 +203,10 @@ export const Automations = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <div className="bg-[rgb(var(--color-bg-secondary))] rounded-xl shadow-sm border border-[rgb(var(--color-border))] p-4 transition-colors duration-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Ativas</p>
+                <p className="text-sm text-[rgb(var(--color-text-secondary))]">Ativas</p>
                 <p className="text-2xl font-bold text-green-600 mt-1">{stats.active}</p>
               </div>
               <div className="p-3 bg-green-100 rounded-lg">
@@ -215,11 +215,11 @@ export const Automations = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <div className="bg-[rgb(var(--color-bg-secondary))] rounded-xl shadow-sm border border-[rgb(var(--color-border))] p-4 transition-colors duration-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Inativas</p>
-                <p className="text-2xl font-bold text-gray-600 mt-1">{stats.inactive}</p>
+                <p className="text-sm text-[rgb(var(--color-text-secondary))]">Inativas</p>
+                <p className="text-2xl font-bold text-[rgb(var(--color-text-secondary))] mt-1">{stats.inactive}</p>
               </div>
               <div className="p-3 bg-gray-100 rounded-lg">
                 <Pause className="w-6 h-6 text-gray-600" />
@@ -227,10 +227,10 @@ export const Automations = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <div className="bg-[rgb(var(--color-bg-secondary))] rounded-xl shadow-sm border border-[rgb(var(--color-border))] p-4 transition-colors duration-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total de Execuções</p>
+                <p className="text-sm text-[rgb(var(--color-text-secondary))]">Total de Execuções</p>
                 <p className="text-2xl font-bold text-blue-600 mt-1">{stats.totalRuns.toLocaleString()}</p>
               </div>
               <div className="p-3 bg-blue-100 rounded-lg">
@@ -241,7 +241,7 @@ export const Automations = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
+      <div className="bg-[rgb(var(--color-bg-secondary))] rounded-xl shadow-sm border border-[rgb(var(--color-border))] mb-6 transition-colors duration-200">
         <div className="p-4 space-y-4">
           <div className="flex items-center space-x-4">
             <div className="flex-1 relative">
@@ -251,7 +251,7 @@ export const Automations = () => {
                 placeholder="Buscar por nome ou descrição..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-[rgb(var(--color-border))] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[rgb(var(--color-bg-secondary))] text-[rgb(var(--color-text-primary))]"
               />
             </div>
 
@@ -280,7 +280,7 @@ export const Automations = () => {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-4 py-2 border border-[rgb(var(--color-border))] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[rgb(var(--color-bg-secondary))] text-[rgb(var(--color-text-primary))]"
             >
               <option value="all">Todos os Status</option>
               <option value="active">Ativo</option>
@@ -308,14 +308,14 @@ export const Automations = () => {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
         </div>
       ) : filteredAutomations.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+        <div className="bg-[rgb(var(--color-bg-secondary))] rounded-xl shadow-sm border border-[rgb(var(--color-border))] p-12 text-center transition-colors duration-200">
           <Zap className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          <h3 className="text-xl font-semibold text-[rgb(var(--color-text-primary))] mb-2">
             {searchTerm || statusFilter !== 'all'
               ? 'Nenhuma automação encontrada'
               : 'Nenhuma automação criada ainda'}
           </h3>
-          <p className="text-gray-600 mb-4">
+          <p className="text-[rgb(var(--color-text-secondary))] mb-4">
             {searchTerm || statusFilter !== 'all'
               ? 'Tente ajustar seus filtros de busca'
               : 'Crie sua primeira automação para começar a automatizar seus chats'}
@@ -326,14 +326,14 @@ export const Automations = () => {
           {filteredAutomations.map((automation) => (
             <div
               key={automation.id}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
+              className="bg-[rgb(var(--color-bg-secondary))] rounded-xl shadow-sm border border-[rgb(var(--color-border))] hover:shadow-md transition-all duration-200"
             >
               <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <Link
                       to={`/automations/editor/${automation.id}`}
-                      className="text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors"
+                      className="text-lg font-semibold text-[rgb(var(--color-text-primary))] hover:text-blue-600 transition-colors"
                     >
                       {automation.name}
                     </Link>
@@ -360,7 +360,7 @@ export const Automations = () => {
                       </button>
 
                       {selectedAutomation === automation.id && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
+                        <div className="absolute right-0 mt-2 w-48 bg-[rgb(var(--color-bg-secondary))] rounded-lg shadow-lg border border-[rgb(var(--color-border))] py-1 z-10">
                           <button
                             onClick={() => {
                               duplicateAutomation(automation);
@@ -411,8 +411,8 @@ export const Automations = () => {
           ))}
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-          <div className="divide-y divide-gray-200">
+        <div className="bg-[rgb(var(--color-bg-secondary))] rounded-xl shadow-sm border border-[rgb(var(--color-border))] transition-colors duration-200">
+          <div className="divide-y divide-[rgb(var(--color-border))]">
             {filteredAutomations.map((automation) => (
               <div key={automation.id} className="p-4 hover:bg-gray-50 transition-colors">
                 <div className="flex items-center justify-between">
@@ -430,7 +430,7 @@ export const Automations = () => {
                     <div className="flex-1">
                       <Link
                         to={`/automations/editor/${automation.id}`}
-                        className="text-base font-semibold text-gray-900 hover:text-blue-600 transition-colors"
+                        className="text-base font-semibold text-[rgb(var(--color-text-primary))] hover:text-blue-600 transition-colors"
                       >
                         {automation.name}
                       </Link>
@@ -463,7 +463,7 @@ export const Automations = () => {
                       </button>
 
                       {selectedAutomation === automation.id && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
+                        <div className="absolute right-0 mt-2 w-48 bg-[rgb(var(--color-bg-secondary))] rounded-lg shadow-lg border border-[rgb(var(--color-border))] py-1 z-10">
                           <button
                             onClick={() => {
                               duplicateAutomation(automation);
