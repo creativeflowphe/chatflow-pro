@@ -47,6 +47,8 @@ export const handleInstagramCallback = async (
   state: string
 ): Promise<{ success: boolean; error?: string }> => {
   try {
+    console.log('Processing Instagram callback:', { code: code?.substring(0, 10) + '...', state });
+
     const { data: oauthState, error: stateError } = await supabase
       .from('oauth_states')
       .select('*')
@@ -56,8 +58,11 @@ export const handleInstagramCallback = async (
       .maybeSingle();
 
     if (stateError || !oauthState) {
+      console.error('OAuth state error:', stateError);
       return { success: false, error: 'Estado OAuth inválido ou expirado' };
     }
+
+    console.log('OAuth state found, calling edge function...');
 
     const { data: result, error: functionError } = await supabase.functions.invoke(
       'instagram-oauth',
@@ -67,8 +72,11 @@ export const handleInstagramCallback = async (
     );
 
     if (functionError || !result?.success) {
+      console.error('Edge function error:', functionError, result);
       return { success: false, error: result?.error || 'Erro ao autenticar com Instagram' };
     }
+
+    console.log('Instagram OAuth successful, saving connection...');
 
     const { access_token, user_id, username } = result;
 
@@ -83,11 +91,15 @@ export const handleInstagramCallback = async (
     });
 
     if (connectionError) {
+      console.error('Connection save error:', connectionError);
       return { success: false, error: 'Erro ao salvar conexão' };
     }
 
+    console.log('Connection saved, cleaning up OAuth state...');
+
     await supabase.from('oauth_states').delete().eq('id', oauthState.id);
 
+    console.log('Instagram connection completed successfully');
     return { success: true };
   } catch (error) {
     console.error('Erro no callback do Instagram:', error);
