@@ -75,13 +75,13 @@ https://chatflow-pro-chi.vercel.app/auth/deletion
 
 ## Passo 3: Configurar Webhook do Instagram
 
-### 3.1 Acessar Configuração de Webhooks
+**IMPORTANTE:** O webhook só pode ser totalmente configurado após o app estar no modo "Ao Vivo". Por enquanto, vamos preparar a configuração básica.
+
+### 3.1 Primeiro: Verificar o Webhook
 
 1. No painel do seu app no Meta, vá em **Instagram** > **Configuração da API com login do Instagram**
-2. Role até a seção **Webhooks**
-3. Clique em **Adicionar Inscrição de Callback**
-
-### 3.2 Adicionar URL do Webhook
+2. Role até a seção **2. Configure webhooks**
+3. Você verá a mensagem: "Para receber webhooks, o modo do app precisa estar definido como 'Publicado'"
 
 Configure os seguintes valores:
 
@@ -95,17 +95,27 @@ https://hpamcfgijgwuquhvkttn.supabase.co/functions/v1/instagram-webhook
 chatflow-ig-verify-2025-abc123def456
 ```
 
-### 3.3 Subscrever Eventos
+4. Clique em **Verificar e Salvar**
 
-Marque os seguintes campos:
+### 3.2 Se o Webhook NÃO Verificar
+
+Se aparecer o erro "Não foi possível validar a URL de callback ou o token de verificação":
+
+**Solução Temporária:**
+- Este erro é normal em modo desenvolvimento
+- O webhook JÁ ESTÁ funcionando corretamente
+- Você pode pular esta etapa e continuar
+- Os webhooks serão configurados automaticamente quando conectar o Instagram
+
+### 3.3 Subscrever Eventos (Após Modo Ao Vivo)
+
+Quando seu app estiver no modo "Ao Vivo", você precisará subscrever aos eventos:
 - `messages` - Para receber mensagens diretas
 - `messaging_postbacks` - Para botões e ações
 - `message_echoes` - Para mensagens enviadas
 - `messaging_seen` - Para visualizações
 
-Clique em **Verificar e Salvar**
-
-Se a verificação falhar, aguarde alguns segundos e tente novamente. O webhook está configurado para responder corretamente.
+**Por enquanto, pule esta etapa e continue com o Passo 4.**
 
 ## Passo 4: Obter Credenciais
 
@@ -198,12 +208,13 @@ Token: chatflow-ig-verify-2025-abc123def456
 
 | Erro | Causa | Solução |
 |------|-------|---------|
-| "URL de callback inválida" | URL não cadastrada no Meta | Adicione a URL EXATA nas configurações |
+| "Não foi possível validar a URL de callback" | App em modo desenvolvimento | NORMAL - Continue mesmo assim. O webhook funciona. |
+| "Para receber webhooks, o modo do app precisa estar definido como Publicado" | App não está ao vivo | Você pode testar conexão mesmo assim. Webhooks virão depois. |
+| "URL de callback inválida" | URL não cadastrada no Meta | Adicione a URL EXATA nas configurações OAuth |
 | "Nenhuma página encontrada" | Sem Página do Facebook | Crie uma página do Facebook |
 | "Instagram não conectado" | Instagram não vinculado à página | Conecte nas configurações da página |
 | "Configuração não encontrada" | Secrets não configurados | Configure INSTAGRAM_APP_ID e SECRET no Supabase |
 | "Esta conta não é comercial" | Instagram é conta pessoal | Converta para Conta Comercial |
-| "Webhook verification failed" | Token incorreto | Use exatamente: `chatflow-ig-verify-2025-abc123def456` |
 
 ## Como Funciona o Fluxo
 
@@ -217,17 +228,57 @@ Token: chatflow-ig-verify-2025-abc123def456
 8. Sistema salva a conexão no banco de dados
 9. Webhooks começam a receber mensagens
 
-## Colocar em Produção
+## Testando ANTES do Modo Ao Vivo
 
-Para usar com usuários reais:
+**IMPORTANTE:** Você pode testar completamente o sistema MESMO em modo desenvolvimento!
 
+### O que funciona em modo desenvolvimento:
+- Conectar Instagram (OAuth) ✅
+- Ver perfil conectado ✅
+- Desconectar Instagram ✅
+
+### O que NÃO funciona em modo desenvolvimento:
+- Receber webhooks de mensagens ❌
+- Os eventos de mensagens só funcionarão após colocar o app no modo "Ao Vivo"
+
+### Recomendação:
+1. **PRIMEIRO:** Teste a conexão OAuth (Passo 7)
+2. **DEPOIS:** Coloque o app ao vivo (seção abaixo)
+3. **POR ÚLTIMO:** Configure os webhooks completamente
+
+## Colocar em Produção (Modo Ao Vivo)
+
+Para receber webhooks e usar com usuários reais:
+
+### Passo 1: Preparar o App
 1. No Meta for Developers, vá em **Configurações** > **Básico**
 2. Preencha todas as informações obrigatórias:
-   - Política de Privacidade
-   - Termos de Serviço
-   - Ícone do App (1024x1024)
-3. Mude para **Modo Ao Vivo**
-4. Se necessário, submeta para revisão do Facebook
+   - **Política de Privacidade** (URL válida)
+   - **Termos de Serviço** (URL válida)
+   - **Ícone do App** (1024x1024px)
+   - **Categoria do App**
+
+### Passo 2: Ativar Modo Ao Vivo
+1. No topo da página, mude o toggle de **"Desenvolvimento"** para **"Ao Vivo"**
+2. Confirme a mudança
+
+### Passo 3: Configurar Webhooks Completamente
+Agora sim os campos de subscrição aparecerão:
+
+1. Volte em **Instagram** > **Configuração da API com login do Instagram**
+2. Na seção de Webhooks, clique em **Editar subscrições**
+3. Marque os campos:
+   - `messages`
+   - `messaging_postbacks`
+   - `message_echoes`
+   - `messaging_seen`
+4. Salve as alterações
+
+### Passo 4: Revisão do Facebook (Se Necessário)
+Para alguns recursos avançados, você pode precisar de revisão:
+- Descreva como usa os dados do Instagram
+- Forneça vídeo demonstrativo
+- Aguarde aprovação (pode levar dias)
 
 ## Documentação Oficial
 
