@@ -1,10 +1,10 @@
-# Guia Completo de Configuração do Instagram
+# Guia Completo de Configuração do Instagram (Graph API)
 
-Este guia irá ajudá-lo a configurar a integração com Instagram do zero, passo a passo, para ambiente de produção.
+Este guia irá ajudá-lo a configurar a integração com Instagram do zero, passo a passo, para ambiente de produção usando a Graph API do Facebook.
 
 ## Visão Geral
 
-A integração do Instagram permite que os usuários conectem suas contas do Instagram ao sistema para automação de mensagens. O sistema usa OAuth2 do Instagram Basic Display API.
+A integração do Instagram permite que os usuários conectem suas contas comerciais do Instagram ao sistema para automação de mensagens. O sistema usa OAuth2 da Instagram Graph API (via Facebook Login).
 
 ## Arquitetura
 
@@ -14,7 +14,39 @@ A integração do Instagram permite que os usuários conectem suas contas do Ins
 
 ---
 
-## Parte 1: Configurar o Aplicativo no Meta for Developers
+## IMPORTANTE: Diferença entre as APIs
+
+Existem DUAS APIs do Instagram:
+
+1. **Instagram Basic Display API** - Para perfis pessoais básicos (ANTIGA)
+2. **Instagram Graph API** - Para contas comerciais com recursos avançados (ATUAL)
+
+**Este sistema usa a Graph API**, que requer:
+- Uma **Página do Facebook**
+- Uma **Conta Comercial do Instagram** conectada à página
+
+---
+
+## Parte 1: Pré-requisitos
+
+### Você Precisa:
+
+1. Uma conta do Facebook
+2. Uma Página do Facebook (crie uma se não tiver)
+3. Uma conta do Instagram convertida para **Conta Comercial** ou **Conta de Criador**
+4. A conta do Instagram deve estar **conectada à Página do Facebook**
+
+### Como Conectar Instagram à Página do Facebook:
+
+1. Acesse sua Página do Facebook
+2. Vá em **Configurações** > **Instagram**
+3. Clique em **Conectar conta**
+4. Faça login na sua conta do Instagram
+5. Confirme a conexão
+
+---
+
+## Parte 2: Configurar o Aplicativo no Meta for Developers
 
 ### Passo 1: Criar o Aplicativo
 
@@ -22,86 +54,87 @@ A integração do Instagram permite que os usuários conectem suas contas do Ins
 2. Faça login com sua conta do Facebook
 3. Clique em **"Meus Aplicativos"** no menu superior direito
 4. Clique em **"Criar Aplicativo"**
-5. Selecione **"Consumidor"** como tipo de aplicativo
+5. Selecione **"Empresa"** como tipo de aplicativo
 6. Preencha:
-   - **Nome do Aplicativo**: Escolha um nome descritivo (ex: "Meu Sistema de Automação")
+   - **Nome do Aplicativo**: Escolha um nome descritivo (ex: "ChatFlow Pro")
    - **Email de Contato**: Seu email válido
 7. Clique em **"Criar Aplicativo"**
 
-### Passo 2: Adicionar o Produto Instagram Basic Display
+### Passo 2: Adicionar o Produto Instagram
 
 1. No painel do aplicativo, na seção **"Adicionar Produtos"**
-2. Localize **"Instagram Basic Display"**
+2. Localize **"Instagram"** (NÃO é o Basic Display)
 3. Clique em **"Configurar"**
 
-### Passo 3: Configurar a API
+### Passo 3: Configurar Permissões e URLs
 
-1. No menu lateral, clique em **"Instagram Basic Display"** > **"Configurações Básicas de Exibição"**
-2. Clique em **"Criar novo Aplicativo"** na seção de configurações
-3. Preencha os seguintes campos:
+1. No menu lateral, clique em **"Instagram"** > **"Configuração da API com login do Instagram"**
 
-#### URLs de Redirecionamento OAuth (IMPORTANTE)
-
-Você precisa adicionar TODAS as URLs que usará:
+2. Configure as **URLs de Redirecionamento OAuth válidas**:
 
 **Para Desenvolvimento Local:**
 ```
 http://localhost:5173/auth/instagram/callback
 ```
 
-**Para Produção (substitua seu-dominio.vercel.app pelo seu domínio real):**
+**Para Produção (substitua pelo seu domínio):**
 ```
 https://seu-dominio.vercel.app/auth/instagram/callback
 ```
 
-#### Outras URLs Obrigatórias:
-
-**Deauthorize Callback URL:**
+3. Configure **"Desautorizar URL de retorno de chamada"**:
 ```
 https://seu-dominio.vercel.app/auth/deauthorize
 ```
 
-**Data Deletion Request URL:**
+4. Configure **"Exclusão de dados do cliente"**:
 ```
 https://seu-dominio.vercel.app/auth/deletion
 ```
 
-4. Clique em **"Salvar Alterações"**
+5. Clique em **"Salvar Alterações"**
 
 ### Passo 4: Obter as Credenciais
 
-1. No menu lateral, vá em **"Configurações"** > **"Básico"**
-2. Copie o **"ID do Aplicativo"** (Instagram App ID)
-3. Clique em **"Mostrar"** no campo **"Chave Secreta do Aplicativo"** e copie o valor
+Você precisará de **DOIS conjuntos** de IDs:
 
-**Guarde essas informações com segurança!**
+#### Do App Principal (Configurações > Básico):
+- **ID do Aplicativo**: Este é o `VITE_INSTAGRAM_APP_ID`
+  - Exemplo: `651067714529155`
 
-### Passo 5: Adicionar Testadores (Modo Desenvolvimento)
+#### Da Configuração do Instagram:
+- **ID do app do Instagram**: Este é o `INSTAGRAM_APP_ID`
+  - Exemplo: `1212987200641405`
+- **Chave secreta do app do Instagram**: Este é o `INSTAGRAM_APP_SECRET`
+  - Exemplo: `02bf4e1dd23655b13aa`
 
-Enquanto seu app estiver em desenvolvimento, apenas testadores aprovados podem conectar:
+**IMPORTANTE**: São valores DIFERENTES! Não confunda!
 
-1. No Instagram Basic Display, vá até a seção **"Funções"** > **"Instagram Testers"**
-2. Clique em **"Adicionar testadores do Instagram"**
-3. Digite o nome de usuário do Instagram
-4. O usuário receberá um convite no app do Instagram
-5. O usuário deve:
-   - Abrir o Instagram no celular
-   - Ir em Configurações > Apps e Sites
-   - Aceitar o convite de testador
+### Passo 5: Adicionar Permissões
+
+1. No menu lateral, vá em **"Configurações do app"** > **"Básico"**
+2. Na seção **"Instagram"**, certifique-se de que as seguintes permissões estão habilitadas:
+   - `instagram_basic`
+   - `instagram_manage_messages`
+   - `instagram_manage_comments`
+   - `pages_show_list`
+   - `pages_read_engagement`
 
 ---
 
-## Parte 2: Configurar Variáveis de Ambiente
+## Parte 3: Configurar Variáveis de Ambiente
 
 ### Para Desenvolvimento Local (.env)
 
-Crie ou edite o arquivo `.env` na raiz do projeto:
+Edite o arquivo `.env` na raiz do projeto:
 
 ```env
 VITE_SUPABASE_URL=https://seu-projeto.supabase.co
 VITE_SUPABASE_ANON_KEY=sua_chave_anonima_aqui
-VITE_INSTAGRAM_APP_ID=seu_instagram_app_id_aqui
+VITE_INSTAGRAM_APP_ID=651067714529155
 ```
+
+**ATENÇÃO**: Use o **ID do Aplicativo Principal** (da página Básico), NÃO o ID do app do Instagram!
 
 ### Para Produção (Vercel)
 
@@ -110,70 +143,41 @@ VITE_INSTAGRAM_APP_ID=seu_instagram_app_id_aqui
 3. Vá em **"Settings"** > **"Environment Variables"**
 4. Adicione as seguintes variáveis:
 
-| Nome | Valor |
-|------|-------|
-| `VITE_SUPABASE_URL` | URL do seu projeto Supabase |
-| `VITE_SUPABASE_ANON_KEY` | Chave anônima do Supabase |
-| `VITE_INSTAGRAM_APP_ID` | ID do aplicativo Instagram |
+| Nome | Valor | Exemplo |
+|------|-------|---------|
+| `VITE_SUPABASE_URL` | URL do seu projeto Supabase | `https://abc123.supabase.co` |
+| `VITE_SUPABASE_ANON_KEY` | Chave anônima do Supabase | `eyJhbG...` |
+| `VITE_INSTAGRAM_APP_ID` | ID do Aplicativo Principal | `651067714529155` |
 
 **IMPORTANTE:** Após adicionar as variáveis, faça um novo deploy do projeto.
 
 ### Para Supabase Edge Functions
 
-As Edge Functions precisam das credenciais secretas do Instagram:
+As Edge Functions precisam das credenciais da configuração do Instagram:
 
 1. Acesse o [Dashboard do Supabase](https://supabase.com/dashboard)
 2. Selecione seu projeto
-3. Vá em **"Project Settings"** > **"Edge Functions"**
-4. Na seção **"Secrets"**, clique em **"Add new secret"**
-5. Adicione:
+3. Vá em **"Project Settings"** > **"Edge Functions"** > **"Secrets"**
+4. Clique em **"Add new secret"** e adicione:
 
-| Nome | Valor |
-|------|-------|
-| `INSTAGRAM_APP_ID` | ID do aplicativo Instagram |
-| `INSTAGRAM_APP_SECRET` | Chave secreta do aplicativo Instagram |
+| Nome | Valor | Exemplo | Onde Encontrar |
+|------|-------|---------|----------------|
+| `INSTAGRAM_APP_ID` | ID do app do Instagram | `1212987200641405` | Instagram > Configuração da API com login |
+| `INSTAGRAM_APP_SECRET` | Chave secreta do Instagram | `02bf4e1dd23655b13aa` | Instagram > Configuração da API com login |
 
-**NOTA:** Não confunda com as variáveis do frontend! Essas são variáveis SECRETAS que rodam no servidor.
-
----
-
-## Parte 3: Estrutura do Banco de Dados
-
-O banco de dados já está configurado com as migrações. As tabelas principais são:
-
-### Tabela `oauth_states`
-Armazena estados temporários do OAuth (expiram em 10 minutos):
-- `id`, `user_id`, `state`, `platform`, `redirect_uri`, `expires_at`, `created_at`
-
-### Tabela `connections`
-Armazena as conexões ativas do Instagram:
-- `id`, `user_id`, `platform`, `platform_user_id`, `platform_username`, `access_token`, `is_active`, `metadata`
+**IMPORTANTE**: Use os valores da **Configuração da API com login do Instagram**, NÃO da página Básico!
 
 ---
 
 ## Parte 4: Deploy da Edge Function
 
-A Edge Function `instagram-oauth` já está no projeto em `supabase/functions/instagram-oauth/index.ts`.
-
-Para fazer deploy:
-
-1. Certifique-se de que as secrets foram configuradas no Supabase (Parte 2)
-2. A função será automaticamente deployada pelo sistema
-
-### Testando a Edge Function
-
-Você pode testar se a função está funcionando:
+A Edge Function `instagram-oauth` já está no projeto. Para fazer deploy:
 
 ```bash
-curl -X POST 'https://seu-projeto.supabase.co/functions/v1/instagram-oauth' \
-  -H "Authorization: Bearer SUA_ANON_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"code": "test", "redirect_uri": "http://localhost:5173/auth/instagram/callback"}'
-```
+# Via Supabase CLI (se tiver instalado)
+supabase functions deploy instagram-oauth
 
-Resposta esperada (sem código válido):
-```json
-{"success": false, "error": "Erro ao obter token: ..."}
+# Ou use a ferramenta de deploy do seu sistema
 ```
 
 ---
@@ -182,19 +186,22 @@ Resposta esperada (sem código válido):
 
 ### Como Funciona:
 
-1. **Usuário clica em "Conectar Instagram"** na página de Conexões
+1. **Usuário clica em "Conectar Instagram"**
 2. **Sistema gera um estado único** e salva na tabela `oauth_states`
-3. **Usuário é redirecionado** para `https://api.instagram.com/oauth/authorize`
-4. **Instagram pede autorização** ao usuário
-5. **Instagram redireciona de volta** com `code` e `state`
-6. **Sistema valida o estado** (segurança contra CSRF)
-7. **Edge Function troca o código por token** usando as credenciais secretas
-8. **Sistema salva a conexão** na tabela `connections`
+3. **Usuário é redirecionado** para o Facebook OAuth
+4. **Facebook pede permissões** (acesso a páginas e Instagram)
+5. **Facebook redireciona de volta** com `code` e `state`
+6. **Sistema valida o estado** (segurança CSRF)
+7. **Edge Function troca o código por token**
+8. **Sistema busca páginas do Facebook**
+9. **Sistema busca conta do Instagram conectada à página**
+10. **Sistema salva a conexão** na tabela `connections`
 
 ### URLs Importantes:
 
 **Desenvolvimento:**
 - Callback: `http://localhost:5173/auth/instagram/callback`
+- OAuth: `https://www.facebook.com/v21.0/dialog/oauth`
 
 **Produção:**
 - Callback: `https://seu-dominio.vercel.app/auth/instagram/callback`
@@ -206,10 +213,12 @@ Resposta esperada (sem código válido):
 ### Checklist de Verificação:
 
 - [ ] App criado no Meta for Developers
-- [ ] Instagram Basic Display API configurada
+- [ ] Produto Instagram adicionado
 - [ ] URLs de redirecionamento configuradas (dev + prod)
-- [ ] Credenciais copiadas (App ID + App Secret)
-- [ ] Testador adicionado e convite aceito no Instagram
+- [ ] Página do Facebook criada
+- [ ] Instagram conectado à Página do Facebook
+- [ ] Instagram é Conta Comercial ou de Criador
+- [ ] Credenciais copiadas corretamente (ambos os IDs)
 - [ ] Variáveis de ambiente configuradas na Vercel
 - [ ] Secrets configuradas no Supabase
 - [ ] Edge Function deployada
@@ -219,53 +228,79 @@ Resposta esperada (sem código válido):
 
 1. Acesse a página de Conexões do sistema
 2. Clique no botão "Conectar" do Instagram
-3. Você será redirecionado para a página do Instagram
-4. Faça login (se necessário) e autorize o app
-5. Você será redirecionado de volta para o sistema
-6. A conexão deve aparecer como "Conectado"
+3. Você será redirecionado para o Facebook
+4. Faça login (se necessário)
+5. Conceda as permissões solicitadas
+6. Selecione a Página do Facebook que tem o Instagram conectado
+7. Você será redirecionado de volta para o sistema
+8. A conexão deve aparecer como "Conectado" com seu username do Instagram
 
-### Possíveis Erros:
+### Possíveis Erros e Soluções:
 
-| Erro | Causa | Solução |
-|------|-------|---------|
-| "Instagram App ID não configurado" | Variável VITE_INSTAGRAM_APP_ID não definida | Configure a variável na Vercel e faça redeploy |
-| "Redirect URI mismatch" | URL não cadastrada no Meta | Adicione a URL exata nas configurações do app |
-| "Estado OAuth inválido" | Estado expirado ou inválido | Tente conectar novamente (estados expiram em 10min) |
-| "Usuário não autorizado" | Não é testador do app | Adicione como testador e aceite o convite |
-| "Configuração do Instagram não encontrada" | Secrets não configuradas no Supabase | Configure INSTAGRAM_APP_ID e INSTAGRAM_APP_SECRET |
+| Erro | Causa Provável | Solução |
+|------|---------------|---------|
+| "Invalid platform app" | App ID incorreto ou app não configurado | Verifique se está usando o ID correto (principal, não do Instagram) |
+| "Instagram App ID não configurado" | Variável VITE_INSTAGRAM_APP_ID não definida | Configure na Vercel e faça redeploy |
+| "Redirect URI mismatch" | URL não cadastrada no Meta | Adicione a URL EXATA nas configurações |
+| "Nenhuma página encontrada" | Conta não tem página do Facebook | Crie uma página do Facebook primeiro |
+| "Página não conectada ao Instagram" | Instagram não vinculado à página | Conecte o Instagram à página nas configurações da página |
+| "Configuração do Instagram não encontrada" | Secrets não configuradas | Configure INSTAGRAM_APP_ID e INSTAGRAM_APP_SECRET no Supabase |
+| "Esta conta não é comercial" | Instagram é conta pessoal | Converta para Conta Comercial ou de Criador |
 
 ---
 
-## Parte 7: Ir para Produção
+## Parte 7: Resumo das Credenciais
 
-Quando estiver pronto para liberar para todos os usuários:
+Para evitar confusão, aqui está um resumo:
 
-### 1. Remover Modo de Desenvolvimento
+### Frontend (.env e Vercel):
+```
+VITE_INSTAGRAM_APP_ID = ID do Aplicativo Principal (Básico)
+Exemplo: 651067714529155
+```
+
+### Backend (Supabase Secrets):
+```
+INSTAGRAM_APP_ID = ID do app do Instagram (Configuração da API)
+Exemplo: 1212987200641405
+
+INSTAGRAM_APP_SECRET = Chave secreta do Instagram (Configuração da API)
+Exemplo: 02bf4e1dd23655b13aa
+```
+
+---
+
+## Parte 8: Ir para Produção
+
+### 1. Verificar Configuração da Business
+
+Antes de publicar:
+- Confirme que sua conta é **Business Verified**
+- Adicione URLs de política de privacidade
+- Adicione URLs de termos de serviço
+- Configure ícones do app (1024x1024)
+
+### 2. Modo Ao Vivo
 
 1. No Meta for Developers, vá em **"Configurações"** > **"Básico"**
-2. Role até **"Modo do Aplicativo"**
-3. Clique em **"Enviar para revisão"**
+2. Toggle para **"Ao vivo"** (live mode)
+3. Se necessário, passe pela revisão do Facebook
 
-### 2. Submeter para Revisão
+### 3. Permissões Avançadas
 
-Você precisará:
-- Adicionar ícones do app (1024x1024)
-- Adicionar URL de política de privacidade
-- Adicionar URL de termos de serviço
-- Descrever como o app usa os dados do Instagram
-- Gravar um vídeo demonstrando o uso do app
-
-### 3. Aguardar Aprovação
-
-A revisão pode levar de alguns dias a algumas semanas. Após aprovado, qualquer usuário poderá conectar.
+Para usar recursos avançados (webhooks, mensagens, etc.), você precisará submeter para revisão:
+- Descreva como usa os dados do Instagram
+- Forneça vídeo demonstrativo
+- Aguarde aprovação (pode levar dias/semanas)
 
 ---
 
 ## Documentação Oficial
 
-- [Instagram Basic Display API](https://developers.facebook.com/docs/instagram-basic-display-api)
-- [Getting Started Guide](https://developers.facebook.com/docs/instagram-basic-display-api/getting-started)
-- [OAuth Documentation](https://developers.facebook.com/docs/instagram-basic-display-api/guides/getting-access-tokens-and-permissions)
+- [Instagram Graph API](https://developers.facebook.com/docs/instagram-api)
+- [Instagram Messaging](https://developers.facebook.com/docs/instagram-api/guides/messaging)
+- [Facebook Login](https://developers.facebook.com/docs/facebook-login)
+- [Access Tokens](https://developers.facebook.com/docs/facebook-login/guides/access-tokens)
 
 ---
 
@@ -274,9 +309,11 @@ A revisão pode levar de alguns dias a algumas semanas. Após aprovado, qualquer
 Se encontrar problemas:
 
 1. Verifique o console do navegador (F12) para erros
-2. Verifique os logs da Edge Function no Supabase
-3. Confirme que todas as variáveis estão configuradas corretamente
-4. Certifique-se de que as URLs de callback estão EXATAMENTE iguais no Meta e no código
+2. Verifique os logs da Edge Function no Supabase Dashboard
+3. Confirme que TODAS as variáveis estão configuradas corretamente
+4. Certifique-se de que está usando os IDs corretos em cada lugar
+5. Verifique se o Instagram está conectado à Página do Facebook
+6. Confirme que a conta do Instagram é Comercial ou de Criador
 
 ---
 

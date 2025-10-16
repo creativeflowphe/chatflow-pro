@@ -32,12 +32,13 @@ export const initiateInstagramOAuth = async (userId: string): Promise<void> => {
     throw new Error('Erro ao iniciar autenticação');
   }
 
-  const authUrl = new URL('https://api.instagram.com/oauth/authorize');
+  const authUrl = new URL('https://www.facebook.com/v21.0/dialog/oauth');
   authUrl.searchParams.append('client_id', INSTAGRAM_APP_ID);
   authUrl.searchParams.append('redirect_uri', REDIRECT_URI);
-  authUrl.searchParams.append('scope', 'user_profile,user_media');
+  authUrl.searchParams.append('scope', 'instagram_basic,instagram_manage_messages,instagram_manage_comments,pages_show_list,pages_read_engagement');
   authUrl.searchParams.append('response_type', 'code');
   authUrl.searchParams.append('state', state);
+  authUrl.searchParams.append('config_id', INSTAGRAM_APP_ID);
 
   window.location.href = authUrl.toString();
 };
