@@ -85,13 +85,13 @@ Deno.serve(async (req: Request) => {
 
     const tokenData: TokenResponse = await tokenResponse.json();
 
-    const pagesResponse = await fetch(
-      `https://graph.facebook.com/v21.0/me/accounts?access_token=${tokenData.access_token}`
+    const businessesResponse = await fetch(
+      `https://graph.facebook.com/v21.0/me/businesses?fields=id,name&access_token=${tokenData.access_token}`
     );
 
-    if (!pagesResponse.ok) {
+    if (!businessesResponse.ok) {
       return new Response(
-        JSON.stringify({ success: false, error: 'Erro ao obter páginas do Facebook' }),
+        JSON.stringify({ success: false, error: 'Erro ao obter Business Manager' }),
         {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -99,13 +99,13 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const pagesData: PageResponse = await pagesResponse.json();
+    const businessesData = await businessesResponse.json();
 
-    if (!pagesData.data || pagesData.data.length === 0) {
+    if (!businessesData.data || businessesData.data.length === 0) {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Nenhuma página do Facebook encontrada. Você precisa ter uma página conectada ao Instagram.'
+          error: 'Nenhum Business Manager encontrado. Você precisa ter acesso a um Business Manager.'
         }),
         {
           status: 400,
@@ -114,16 +114,16 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const page = pagesData.data[0];
-    const pageAccessToken = page.access_token;
+    const business = businessesData.data[0];
+    const businessId = business.id;
 
-    const instagramAccountResponse = await fetch(
-      `https://graph.facebook.com/v21.0/${page.id}?fields=instagram_business_account&access_token=${pageAccessToken}`
+    const instagramAccountsResponse = await fetch(
+      `https://graph.facebook.com/v21.0/${businessId}/instagram_accounts?fields=id,username,name&access_token=${tokenData.access_token}`
     );
 
-    if (!instagramAccountResponse.ok) {
+    if (!instagramAccountsResponse.ok) {
       return new Response(
-        JSON.stringify({ success: false, error: 'Erro ao obter conta do Instagram' }),
+        JSON.stringify({ success: false, error: 'Erro ao obter contas do Instagram no Business Manager' }),
         {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -131,13 +131,13 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const instagramAccountData: InstagramAccountResponse = await instagramAccountResponse.json();
+    const instagramAccountsData = await instagramAccountsResponse.json();
 
-    if (!instagramAccountData.instagram_business_account) {
+    if (!instagramAccountsData.data || instagramAccountsData.data.length === 0) {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Esta página não está conectada a uma conta comercial do Instagram. Conecte sua conta do Instagram à página do Facebook.'
+          error: 'Nenhuma conta do Instagram encontrada no Business Manager. Adicione uma conta do Instagram no BM.'
         }),
         {
           status: 400,
@@ -146,10 +146,11 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const instagramAccountId = instagramAccountData.instagram_business_account.id;
+    const instagramAccount = instagramAccountsData.data[0];
+    const instagramAccountId = instagramAccount.id;
 
     const profileResponse = await fetch(
-      `https://graph.facebook.com/v21.0/${instagramAccountId}?fields=id,username&access_token=${pageAccessToken}`
+      `https://graph.facebook.com/v21.0/${instagramAccountId}?fields=id,username&access_token=${tokenData.access_token}`
     );
 
     if (!profileResponse.ok) {
@@ -167,7 +168,7 @@ Deno.serve(async (req: Request) => {
     return new Response(
       JSON.stringify({
         success: true,
-        access_token: pageAccessToken,
+        access_token: tokenData.access_token,
         user_id: profileData.id,
         username: profileData.username,
       }),

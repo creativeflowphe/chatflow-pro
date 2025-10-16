@@ -35,9 +35,11 @@ export const initiateInstagramOAuth = async (userId: string): Promise<void> => {
   const authUrl = new URL('https://www.facebook.com/v21.0/dialog/oauth');
   authUrl.searchParams.append('client_id', INSTAGRAM_APP_ID);
   authUrl.searchParams.append('redirect_uri', REDIRECT_URI);
-  authUrl.searchParams.append('scope', 'instagram_basic,instagram_manage_messages,instagram_manage_comments,pages_show_list,pages_read_engagement,business_management');
+  authUrl.searchParams.append('scope', 'business_management,instagram_basic,instagram_manage_messages,instagram_manage_comments,pages_show_list,pages_read_engagement');
   authUrl.searchParams.append('response_type', 'code');
   authUrl.searchParams.append('state', state);
+  authUrl.searchParams.append('config_id', '');
+  authUrl.searchParams.append('extras', JSON.stringify({ setup: { channel: 'IG_API_ONBOARDING' } }));
 
   window.location.href = authUrl.toString();
 };
