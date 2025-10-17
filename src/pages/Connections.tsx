@@ -136,27 +136,25 @@ export const Connections = () => {
     } catch (error: any) {
       console.error('Erro ao conectar plataforma:', error);
       toast.error(error.message || 'Erro ao conectar plataforma');
-      // Fallback prompt for manual BM token
+      // Fallback manual BM token insert (hardcoded token)
       if (platform === 'instagram') {
-        const manualToken = prompt('OAuth falhou. Cole o System User Token do BM manualmente:');
-        if (manualToken) {
-          const { error: manualError } = await supabase
-            .from('connections')
-            .insert({
-              user_id: user.id,
-              platform: 'instagram',
-              account_name: '@pheenixvesting',
-              account_id: '17841025451798',
-              access_token: manualToken,
-              status: 'active',
-              metadata: { verify_token: 'chatflow-ig-verify-2025-abc123def456' }
-            });
-          if (manualError) {
-            toast.error('Erro ao salvar token manual: ' + manualError.message);
-          } else {
-            toast.success('Instagram conectado via BM token!');
-            await loadConnections();
-          }
+        const BM_TOKEN = 'EAHEGX9yinnIBPgCZCPcHxwj0cIfp8v2puLoVlmwU87aiP2NB9Qyq0hSu48lCbAxqIPE4ZB6PEwFU4LP5SvEliefOgOMtN2zDYAUJ4hE9HLax9ZCsAwHVRIgnH4m8KSbCgcEa5ZBSagwY53b0v8P9kO7o5BErFZCGb3xbjyaoGYLMr2JGjWyl8LUZCTKeZCRjBPLNwZDZD';  // Seu token BM
+        const { error: manualError } = await supabase
+          .from('connections')
+          .insert({
+            user_id: user.id,
+            platform: 'instagram',
+            account_name: '@pheenixvesting',
+            account_id: '17841025451798',
+            access_token: BM_TOKEN,
+            status: 'active',
+            metadata: { verify_token: 'chatflow-ig-verify-2025-abc123def456' }
+          });
+        if (manualError) {
+          toast.error('Erro ao salvar token BM manual: ' + manualError.message);
+        } else {
+          toast.success('Instagram conectado via BM token!');
+          await loadConnections();
         }
       }
     } finally {
