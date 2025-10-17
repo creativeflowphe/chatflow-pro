@@ -3,7 +3,7 @@ import { Plus, Instagram, Facebook, MessageCircle, Music } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
-import { initiateInstagramOAuth, disconnectInstagram } from '../services/instagramOAuth';
+import { disconnectInstagram } from '../services/instagramOAuth';
 
 interface Connection {
   id: string;
@@ -73,39 +73,31 @@ export const Connections = () => {
 
     try {
       if (platform === 'instagram') {
-        // Try OAuth first
-        try {
-          await initiateInstagramOAuth(user.id);
-        } catch (oauthError) {
-          console.log('OAuth failed, trying manual BM token input');
-          // Fallback to manual BM token input
-          const bmToken = prompt('OAuth falhou. Cole o System User Token do BM para conectar manualmente:');
-          if (bmToken) {
-            const { error } = await supabase
-              .from('connections')
-              .insert([
-                {
-                  user_id: user.id,
-                  platform: 'instagram',
-                  account_name: '@pheenixvesting',  // Default for your IG
-                  account_id: '17841025451798',  // Your IG ID
-                  access_token: bmToken,
-                  status: 'active',
-                  metadata: { verify_token: 'chatflow-ig-verify-2025-abc123def456' }  // For webhook
-                },
-              ]);
+        // Hardcoded new ID for OAuth (no env)
+        const INSTAGRAM_APP_ID = '31813681161608818';
+        const REDIRECT_URI = 'https://chatflow-pro-chi.vercel.app/auth/instagram/callback';
+        const scopes = 'business_management,instagram_basic,instagram_manage_messages,instagram_manage_comments,pages_show_list,pages_read_engagement';
+        const state = Date.now().toString();  // Simple state
 
-            if (error) {
-              console.error('Erro ao salvar BM token:', error);
-              toast.error(`Erro ao conectar via BM: ${error.message}`);
-            } else {
-              toast.success('Instagram conectado via BM token!');
-              await loadConnections();
-            }
-          } else {
-            toast.error('Token BM cancelado. Tente OAuth novamente.');
-          }
+        // Save state in Supabase for callback validation
+        const { error: stateError } = await supabase
+          .from('oauth_states')
+          .insert({
+            user_id: user.id,
+            state,
+            platform: 'instagram',
+            redirect_uri: REDIRECT_URI,
+          });
+
+        if (stateError) {
+          throw new Error('Erro ao salvar state de OAuth');
         }
+
+        // OAuth URL with hardcoded new ID
+        const authUrl = `https://www.facebook.com/v21.0/dialog/oauth?client_id=${INSTAGRAM_APP_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(scopes)}&response_type=code&state=${state}&ret=login`;
+
+        // Redirect to OAuth
+        window.location.href = authUrl;
       } else {
         const existingConnection = connections.find(c => c.platform === platform);
 
@@ -144,6 +136,29 @@ export const Connections = () => {
     } catch (error: any) {
       console.error('Erro ao conectar plataforma:', error);
       toast.error(error.message || 'Erro ao conectar plataforma');
+      // Fallback prompt for manual BM token
+      if (platform === 'instagram') {
+        const manualToken = prompt('OAuth falhou. Cole o System User Token do BM manualmente:');
+        if (manualToken) {
+          const { error: manualError } = await supabase
+            .from('connections')
+            .insert({
+              user_id: user.id,
+              platform: 'instagram',
+              account_name: '@pheenixvesting',
+              account_id: '17841025451798',
+              access_token: manualToken,
+              status: 'active',
+              metadata: { verify_token: 'chatflow-ig-verify-2025-abc123def456' }
+            });
+          if (manualError) {
+            toast.error('Erro ao salvar token manual: ' + manualError.message);
+          } else {
+            toast.success('Instagram conectado via BM token!');
+            await loadConnections();
+          }
+        }
+      }
     } finally {
       setConnecting(false);
     }
