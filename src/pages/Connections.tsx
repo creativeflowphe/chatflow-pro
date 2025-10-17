@@ -43,7 +43,15 @@ export const Connections = () => {
       .order('created_at', { ascending: false });
 
     if (!error && data) {
-      setConnections(data);
+      // Map fields to match interface (account_name -> platform_username, status -> is_active)
+      const mappedConnections = data.map(conn => ({
+        id: conn.id,
+        platform: conn.platform,
+        platform_username: conn.account_name || conn.platform_username,
+        is_active: conn.status === 'active',
+        created_at: conn.created_at,
+      }));
+      setConnections(mappedConnections);
     }
     setLoading(false);
   };
@@ -65,7 +73,39 @@ export const Connections = () => {
 
     try {
       if (platform === 'instagram') {
-        await initiateInstagramOAuth(user.id);
+        // Try OAuth first
+        try {
+          await initiateInstagramOAuth(user.id);
+        } catch (oauthError) {
+          console.log('OAuth failed, trying manual BM token input');
+          // Fallback to manual BM token input
+          const bmToken = prompt('OAuth falhou. Cole o System User Token do BM para conectar manualmente:');
+          if (bmToken) {
+            const { error } = await supabase
+              .from('connections')
+              .insert([
+                {
+                  user_id: user.id,
+                  platform: 'instagram',
+                  account_name: '@pheenixvesting',  // Default for your IG
+                  account_id: '17841025451798',  // Your IG ID
+                  access_token: bmToken,
+                  status: 'active',
+                  metadata: { verify_token: 'chatflow-ig-verify-2025-abc123def456' }  // For webhook
+                },
+              ]);
+
+            if (error) {
+              console.error('Erro ao salvar BM token:', error);
+              toast.error(`Erro ao conectar via BM: ${error.message}`);
+            } else {
+              toast.success('Instagram conectado via BM token!');
+              await loadConnections();
+            }
+          } else {
+            toast.error('Token BM cancelado. Tente OAuth novamente.');
+          }
+        }
       } else {
         const existingConnection = connections.find(c => c.platform === platform);
 
@@ -81,10 +121,11 @@ export const Connections = () => {
             {
               user_id: user.id,
               platform,
-              platform_user_id: `${platform}_user_${Date.now()}`,
-              platform_username: `${platform}_conta_teste`,
-              is_active: true,
+              account_name: `${platform}_conta_teste`,
+              account_id: `${platform}_user_${Date.now()}`,
               access_token: `fake_token_${platform}`,
+              status: 'active',
+              metadata: {}
             },
           ]);
 
@@ -267,8 +308,6 @@ export const Connections = () => {
           </div>
         </div>
       )}
-
-
     </div>
   );
 };
