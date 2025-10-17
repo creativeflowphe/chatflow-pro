@@ -2,10 +2,14 @@ import { supabase } from '../lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
 import toast from 'react-hot-toast';
 
-// Constants from env
-const INSTAGRAM_APP_ID = import.meta.env.VITE_INSTAGRAM_APP_ID || '318136816080818';  // Seu novo ID do .env
-const REDIRECT_URI = import.meta.env.VITE_APP_URL ? `${import.meta.env.VITE_APP_URL}/auth/instagram/callback` : 'https://chatflow-pro-chi.vercel.app/auth/instagram/callback';
+// Hardcoded constants (no env vars)
+const INSTAGRAM_APP_ID = '31813681161608818';  // VITE_INSTAGRAM_APP_ID
+const REDIRECT_URI = 'https://chatflow-pro-chi.vercel.app/auth/instagram/callback';
 const INSTAGRAM_VERIFY_TOKEN = 'chatflow-ig-verify-2025-abc123def456';  // Verify pro webhook
+const INSTAGRAM_APP_SECRET = '71c81ffe83617c7a7801a1722d39728f';  // INSTAGRAM_APP_SECRET
+const SUPABASE_URL = 'https://hpamcfgijgwuquhvkttn.supabase.co';
+const SUPABASE_ANON_KEY = '666f5a09e7720780934848bc8a7368e5';  // VITE_SUPABASE_ANON_KEY
+const WEBHOOK_URL = 'https://hpamcfgijgwuquhvkttn.supabase.co/functions/v1/instagram-webhook';
 
 // Generate random state for OAuth security
 const generateState = () => uuidv4();
@@ -31,7 +35,7 @@ export const initiateInstagramOAuth = async (userId: string) => {
   // BM-friendly scopes for manage_messages and business
   const scopes = 'business_management,instagram_basic,instagram_manage_messages,instagram_manage_comments,pages_show_list,pages_read_engagement';
 
-  // OAuth URL with env ID (novo!)
+  // OAuth URL with hardcoded ID
   const authUrl = `https://www.facebook.com/v21.0/dialog/oauth?client_id=${INSTAGRAM_APP_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(scopes)}&response_type=code&state=${state}&ret=login`;
 
   // Redirect to OAuth
@@ -72,7 +76,7 @@ export const handleInstagramCallback = async () => {
 
   try {
     // Exchange code for short-lived token
-    const tokenResponse = await fetch(`https://graph.facebook.com/v21.0/oauth/access_token?client_id=${INSTAGRAM_APP_ID}&client_secret=${import.meta.env.VITE_INSTAGRAM_APP_SECRET || 'SEU_APP_SECRET_AQUI'}&code=${code}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`);
+    const tokenResponse = await fetch(`https://graph.facebook.com/v21.0/oauth/access_token?client_id=${INSTAGRAM_APP_ID}&client_secret=${INSTAGRAM_APP_SECRET}&code=${code}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`);
 
     if (!tokenResponse.ok) {
       throw new Error('Falha ao trocar code por token');
@@ -81,7 +85,7 @@ export const handleInstagramCallback = async () => {
     const { access_token: shortToken } = await tokenResponse.json();
 
     // Get long-lived token (60 days, extendable for BM)
-    const longTokenResponse = await fetch(`https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${INSTAGRAM_APP_ID}&client_secret=${import.meta.env.VITE_INSTAGRAM_APP_SECRET || 'SEU_APP_SECRET_AQUI'}&fb_exchange_token=${shortToken}`);
+    const longTokenResponse = await fetch(`https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${INSTAGRAM_APP_ID}&client_secret=${INSTAGRAM_APP_SECRET}&fb_exchange_token=${shortToken}`);
 
     const { access_token: longToken } = await longTokenResponse.json();
 
