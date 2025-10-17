@@ -2,7 +2,7 @@ import { supabase } from '../lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
 import toast from 'react-hot-toast';
 
-// Hardcoded constants (no env vars)
+// Hardcoded values (no env vars)
 const INSTAGRAM_APP_ID = '31813681161608818';  // VITE_INSTAGRAM_APP_ID
 const REDIRECT_URI = 'https://chatflow-pro-chi.vercel.app/auth/instagram/callback';
 const INSTAGRAM_VERIFY_TOKEN = 'chatflow-ig-verify-2025-abc123def456';  // Verify pro webhook
