@@ -1,116 +1,174 @@
 import { supabase } from '../lib/supabase';
+import { v4 as uuidv4 } from 'uuid';
 
-const getInstagramAppId = (): string | undefined => {
-  return import.meta.env.VITE_INSTAGRAM_APP_ID;
-};
+// Constants
+const INSTAGRAM_APP_ID = import.meta.env.VITE_INSTAGRAM_APP_ID || '318136816080818';  // Puxa do .env novo
+const REDIRECT_URI = import.meta.env.VITE_APP_URL ? `${import.meta.env.VITE_APP_URL}/auth/instagram/callback` : 'https://chatflow-pro-chi.vercel.app/auth/instagram/callback';
+const INSTAGRAM_VERIFY_TOKEN = 'chatflow-ig-verify-2025-abc123def456';  // Seu verify pro webhook
 
-const REDIRECT_URI = `${window.location.origin}/auth/instagram/callback`;
+// Generate random state for OAuth security
+const generateState = () => uuidv4();
 
-export const generateRandomState = (): string => {
-  const array = new Uint8Array(32);
-  crypto.getRandomValues(array);
-  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
-};
+// Step 1: Initiate Instagram OAuth (BM flow)
+export const initiateInstagramOAuth = async (userId: string) => {
+  const state = generateState();
 
-export const initiateInstagramOAuth = async (userId: string): Promise<void> => {
-  const INSTAGRAM_APP_ID = getInstagramAppId();
-
-  if (!INSTAGRAM_APP_ID) {
-    throw new Error('Instagram App ID não configurado. Por favor, configure a variável de ambiente VITE_INSTAGRAM_APP_ID');
-  }
-
-  const state = generateRandomState();
-
-  const { error } = await supabase.from('oauth_states').insert({
-    user_id: userId,
-    state,
-    platform: 'instagram',
-    redirect_uri: REDIRECT_URI,
-  });
-
-  if (error) {
-    throw new Error('Erro ao iniciar autenticação');
-  }
-
-  const authUrl = new URL('https://www.facebook.com/v21.0/dialog/oauth');
-  authUrl.searchParams.append('client_id', INSTAGRAM_APP_ID);
-  authUrl.searchParams.append('redirect_uri', REDIRECT_URI);
-  authUrl.searchParams.append('scope', 'business_management,instagram_basic,instagram_manage_messages,instagram_manage_comments,pages_show_list,pages_read_engagement');
-  authUrl.searchParams.append('response_type', 'code');
-  authUrl.searchParams.append('state', state);
-  authUrl.searchParams.append('config_id', '');
-  authUrl.searchParams.append('extras', JSON.stringify({ setup: { channel: 'IG_API_ONBOARDING' } }));
-
-  window.location.href = authUrl.toString();
-};
-
-export const handleInstagramCallback = async (
-  code: string,
-  state: string
-): Promise<{ success: boolean; error?: string }> => {
-  try {
-    console.log('Processing Instagram callback:', { code: code?.substring(0, 10) + '...', state });
-
-    const { data: oauthState, error: stateError } = await supabase
-      .from('oauth_states')
-      .select('*')
-      .eq('state', state)
-      .eq('platform', 'instagram')
-      .gt('expires_at', new Date().toISOString())
-      .maybeSingle();
-
-    if (stateError || !oauthState) {
-      console.error('OAuth state error:', stateError);
-      return { success: false, error: 'Estado OAuth inválido ou expirado' };
-    }
-
-    console.log('OAuth state found, calling edge function...');
-
-    const { data: result, error: functionError } = await supabase.functions.invoke(
-      'instagram-oauth',
-      {
-        body: { code, redirect_uri: REDIRECT_URI },
-      }
-    );
-
-    if (functionError || !result?.success) {
-      console.error('Edge function error:', functionError, result);
-      return { success: false, error: result?.error || 'Erro ao autenticar com Instagram' };
-    }
-
-    console.log('Instagram OAuth successful, saving connection...');
-
-    const { access_token, user_id, username } = result;
-
-    const { error: connectionError } = await supabase.from('connections').insert({
-      user_id: oauthState.user_id,
+  // Save state in Supabase for callback validation
+  const { error: stateError } = await supabase
+    .from('oauth_states')
+    .insert({
+      user_id: userId,
+      state,
       platform: 'instagram',
-      platform_user_id: user_id,
-      platform_username: username,
-      access_token,
-      is_active: true,
-      metadata: { username },
+      redirect_uri: REDIRECT_URI,
     });
 
-    if (connectionError) {
-      console.error('Connection save error:', connectionError);
-      return { success: false, error: 'Erro ao salvar conexão' };
+  if (stateError) {
+    throw new Error('Erro ao salvar state de OAuth');
+  }
+
+  // BM-friendly scopes for manage_messages and business
+  const scopes = 'instagram_basic,instagram_manage_messages,instagram_manage_comments,pages_show_list,pages_read_engagement,business_management';
+
+  // OAuth URL with env ID
+  const authUrl = `https://www.facebook.com/v21.0/dialog/oauth?client_id=${INSTAGRAM_APP_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(scopes)}&response_type=code&state=${state}&ret=login`;
+
+  // Redirect to OAuth
+  window.location.href = authUrl;
+};
+
+// Step 2: Callback handler (called from /auth/instagram/callback route)
+export const handleInstagramCallback = async () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const code = urlParams.get('code');
+  const state = urlParams.get('state');
+  const error = urlParams.get('error');
+
+  if (error) {
+    console.error('OAuth Error:', error);
+    toast.error('Erro na autenticação: ' + urlParams.get('error_description') || 'Tente novamente');
+    return;
+  }
+
+  if (!code || !state) {
+    toast.error('Código ou state inválido');
+    return;
+  }
+
+  // Validate state from Supabase
+  const { data: stateData, error: stateError } = await supabase
+    .from('oauth_states')
+    .select('user_id')
+    .eq('state', state)
+    .single();
+
+  if (stateError || !stateData) {
+    toast.error('State inválido ou expirado');
+    return;
+  }
+
+  const userId = stateData.user_id;
+
+  try {
+    // Exchange code for long-lived token (BM flow)
+    const tokenResponse = await fetch(`https://graph.facebook.com/v21.0/oauth/access_token?client_id=${INSTAGRAM_APP_ID}&client_secret=${import.meta.env.VITE_INSTAGRAM_APP_SECRET || 'SEU_APP_SECRET_AQUI'}&code=${code}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`);
+
+    if (!tokenResponse.ok) {
+      throw new Error('Falha ao trocar code por token');
     }
 
-    console.log('Connection saved, cleaning up OAuth state...');
+    const { access_token: shortToken } = await tokenResponse.json();
 
-    await supabase.from('oauth_states').delete().eq('id', oauthState.id);
+    // Get long-lived token (60 days, extendable)
+    const longTokenResponse = await fetch(`https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${INSTAGRAM_APP_ID}&client_secret=${import.meta.env.VITE_INSTAGRAM_APP_SECRET || 'SEU_APP_SECRET_AQUI'}&fb_exchange_token=${shortToken}`);
 
-    console.log('Instagram connection completed successfully');
-    return { success: true };
-  } catch (error) {
-    console.error('Erro no callback do Instagram:', error);
-    return { success: false, error: 'Erro ao processar autenticação' };
+    const { access_token: longToken } = await longTokenResponse.json();
+
+    // Get user accounts (BM businesses and IG)
+    const accountsResponse = await fetch(`https://graph.facebook.com/v21.0/me/accounts?access_token=${longToken}&fields=access_token,name,id,instagram_business_account{username,id}`);
+
+    const { data: accounts } = await accountsResponse.json();
+
+    // Find IG account (assume first for now)
+    const igAccount = accounts.find((acc: any) => acc.instagram_business_account);
+    if (!igAccount) {
+      throw new Error('Nenhuma conta do Instagram encontrada no BM');
+    }
+
+    const igData = igAccount.instagram_business_account;
+    const pageAccessToken = igAccount.access_token;  // Page token for webhook
+
+    // Save connection with BM token
+    const { error: insertError } = await supabase
+      .from('connections')
+      .insert({
+        user_id: userId,
+        platform: 'instagram',
+        account_name: igData.username,
+        account_id: igData.id,
+        access_token: longToken,  // Long-lived BM token
+        refresh_token: pageAccessToken,  // Page token for API calls
+        status: 'active',
+        metadata: { 
+          business_id: igAccount.id,  // BM link
+          verify_token: INSTAGRAM_VERIFY_TOKEN 
+        }
+      });
+
+    if (insertError) {
+      throw new Error('Erro ao salvar conexão: ' + insertError.message);
+    }
+
+    // Clean up state
+    await supabase.from('oauth_states').delete().eq('state', state);
+
+    toast.success('Instagram conectado via BM!');
+    window.location.href = '/automations/connections';  // Redirect back
+  } catch (error: any) {
+    console.error('Callback error:', error);
+    toast.error(error.message || 'Erro na conexão BM');
+    // Fallback prompt for manual token
+    const manualToken = prompt('OAuth falhou. Cole o System User Token do BM manualmente:');
+    if (manualToken) {
+      const { error: manualError } = await supabase
+        .from('connections')
+        .insert({
+          user_id: userId,
+          platform: 'instagram',
+          account_name: '@pheenixvesting',
+          account_id: '17841025451798',
+          access_token: manualToken,
+          status: 'active',
+          metadata: { verify_token: INSTAGRAM_VERIFY_TOKEN }
+        });
+      if (manualError) {
+        toast.error('Erro ao salvar token manual: ' + manualError.message);
+      } else {
+        toast.success('Conectado via token manual!');
+        window.location.href = '/automations/connections';
+      }
+    }
   }
 };
 
-export const disconnectInstagram = async (connectionId: string): Promise<boolean> => {
+// Disconnect Instagram (revoke token)
+export const disconnectInstagram = async (connectionId: string) => {
+  const { data: connection } = await supabase
+    .from('connections')
+    .select('access_token, account_id')
+    .eq('id', connectionId)
+    .single();
+
+  if (!connection) return false;
+
   try {
+    // Revoke token via Graph API
+    await fetch(`https://graph.facebook.com/v21.0/${connection.account_id}/permissions`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${connection.access_token}` }
+    });
+
+    // Delete from Supabase
     const { error } = await supabase
       .from('connections')
       .delete()
@@ -118,7 +176,7 @@ export const disconnectInstagram = async (connectionId: string): Promise<boolean
 
     return !error;
   } catch (error) {
-    console.error('Erro ao desconectar Instagram:', error);
+    console.error('Disconnect error:', error);
     return false;
   }
 };
